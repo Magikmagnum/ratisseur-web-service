@@ -1,0 +1,75 @@
+.titleBox {
+    margin: 60px 0 30px 0;
+
+    .title {
+        font-size: 16px;
+    }
+
+    .subTitle {
+        font-weight: 300;
+        font-size: 14px;
+        color: #00a3b4;
+    }
+}
+
+
+
+//-------------- Titre
+
+.title {
+    font-weight: bold;
+}
+
+
+.titleCard {
+    font-size: 18px;
+    color: #000;
+}
+
+.titleComment {
+    font-size: 14px;
+    color: #4c4c4c;
+}
+
+.titleMargin {
+    margin: 12px 0;
+}
+
+
+// -----------------text ----------------
+
+.text {
+
+    color: #4c4c4c;
+    text-align: justify;
+    font-weight: 400;
+}
+
+.textParagraph {
+    line-height: 1.6em;
+    font-size: 1.1em;
+    margin: 20px 0;
+}
+
+.textComment {
+    line-height: 1.6em;
+    font-size: 0.9em;
+    max-width: 380px;
+}
+
+
+.textSuccess {
+    color: #00a3b4
+}
+
+.textDanger {
+    color: #f44336;
+}
+
+.textCenter {
+    text-align: center;
+}
+
+.textClick {
+    cursor: pointer;
+}

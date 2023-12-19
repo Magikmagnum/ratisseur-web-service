@@ -1,0 +1,56 @@
+
+/.env.local
+/.env.*.local
+/.env.*.local.php
+
+# Fichiers Symfony à ignorer
+/app/bootstrap.php.cache
+/var/cache/*
+/var/logs/*
+/var/sessions/*
+!var/cache/.gitkeep
+!var/logs/.gitkeep
+!var/sessions/.gitkeep
+
+# Fichiers de configuration à ignorer
+/app/config/parameters.yml
+/app/config/parameters.yml.dist
+
+# Autres fichiers Symfony à ignorer
+/bin/*
+/vendor/*
+/web/bundles/*
+
+
+
+###> symfony/framework-bundle ###
+php/.env.local
+php/.env.local.php
+php/.env.*.local
+php/config/secrets/prod/prod.decrypt.private.php
+php/public/bundles/
+php/var/
+php/vendor/
+php/vendor
+###< symfony/framework-bundle ###
+
+###> lexik/jwt-authentication-bundle ###
+php/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
+
+
+# dependencies
+reactJs/node_modules/*
+reactJs/.pnp
+.pnp.js
+
+# testing
+reactJs/coverage
+
+
+reactJs/docker-compose.yml
+
+reactJs/node_modules
+reactJs/README.md
+
+php/translations/lang.fr.yaml

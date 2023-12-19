@@ -1,0 +1,17 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default"
+            },
+            "previewLimit": 50,
+            "server": "http://15.188.23.24",
+            "port": 8088,
+            "driver": "MySQL",
+            "database": "db_3ptitschats",
+            "username": "root",
+            "name": "3ptitschats",
+            "password": ""
+        }
+    ]
+}

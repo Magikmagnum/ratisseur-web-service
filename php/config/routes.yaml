@@ -1,0 +1,16 @@
+# index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+
+controllers:
+    resource: ../src/Controller/
+    type: annotation
+    prefix: /api/v1
+
+kernel:
+    resource: ../src/Kernel.php
+    type: annotation
+
+security_login:
+    path: /api/v1/login
+    methods: [POST]
