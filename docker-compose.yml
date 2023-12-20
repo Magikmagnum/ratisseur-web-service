@@ -5,7 +5,7 @@ services:
             build: apache
             container_name: www_arosaje
             ports:
-                  - "8642:80"
+                  - "8742:80"
             volumes:
                   - ./apache/vhosts:/etc/apache2/sites-enabled
                   - ./:/var/www
@@ -31,7 +31,7 @@ services:
             depends_on:
                   - db
             ports:
-                  - 8188:80
+                  - 8187:80
             environment:
                   PMA_HOST: db
             networks:
@@ -42,7 +42,7 @@ services:
             container_name: maildev_arosaje
             command: bin/maildev --web 80 --smtp 25 --hide-extensions STARTTLS
             ports:
-                  - "8182:80"
+                  - "8185:80"
             restart: always
             networks:
                   - dev
@@ -53,7 +53,7 @@ services:
                   dockerfile: Dockerfile
             container_name: reactapp_arosaje
             ports:
-                  - "3100:3000"
+                  - "3120:3000"
             volumes:
                   - ./reactJs:/app
             environment:
