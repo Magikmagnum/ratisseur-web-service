@@ -25,7 +25,7 @@ security:
         register:
             pattern: ^/api/v1/register
             stateless: true
-            security: false
+            # security: false
 
         api:
             pattern:   ^/api

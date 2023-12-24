@@ -11,7 +11,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\User\UserInterface;
+
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+
+
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  *  
@@ -49,63 +54,58 @@ class SecurityController extends AbstractController
 
 
     /**
-     * 
      * @Route("/register", name="security_register", methods={"POST"})
      * 
-     * @OA\Post(
-     *  path="/api/v1/register",
-     *  tags={"Securities"},
-     *  @OA\RequestBody(
-     *      request="Register",
-     *      description="Corp de la requete",
-     *      required=true,
-     *      @OA\JsonContent(
-     *          @OA\Property(type="string", property="email", example="coucou@exemple.com"),
-     *          @OA\Property(type="string", property="password", required=true, example="emileA15ans"),
-     *      )
-     *  ), 
-     * 
-     *  @OA\Response(
-     *      response="201",
-     *      description="Inscription",
-     *      @OA\JsonContent(ref="#/components/schemas/Security"),
-     *  ),
-     * 
-     *  @OA\Response( response="400", ref="#/components/responses/BadRequest" ),
-     *  @OA\Response( response="403", ref="#/components/responses/ForBidden" ),
-     *  @OA\Response( response="404", ref="#/components/responses/NotFound" ),
-     * 
-     * )
+     *
+     * @param Request $request
+     * @param ValidatorInterface $validator
+     * @param UserPasswordHasherInterface $passwordEncoder
+     * @return JsonResponse
      */
-    public function register(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
+    public function register(Request $request, ValidatorInterface $validator, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
-        $data = json_decode($request->getContent());
-        $errors = [];
+        // Decode JSON data
+        $data = json_decode($request->getContent(), true);
 
+        // Validate data using Symfony's validator
         $user = new User();
-        $user->setEmail($data->email);
+        $user->setEmail($data['email']);
         $user->setRoles(['ROLE_USER']);
-        $user->setPassword($data->password);
+        $user->setPassword($data['password']);
 
-        if (!$errors = $this->getErrorUser($user)) {
-            $user->setPassword($passwordHasher->hashPassword($user, $data->password));
 
-            $this->getManager()->persist($user);
-            $this->getManager()->flush();
+        // $errors = $validator->validate($user);
 
-            // creation du token et initialisation dans le attribut password
-            $user->setToken($this->jWTManager->create($user));
-            $response = $this->statusCode(Response::HTTP_CREATED, $user);
+        // if (count($errors) > 0) {
+        //     $errorMessages = [];
+        //     foreach ($errors as $error) {
+        //         $errorMessages[] = $error->getMessage();
+        //     }
 
-            return $this->json($response, $response["status"], [], ["groups" => "read:auth:item"]);
-        }
+        //     $response = $this->statusCode(Response::HTTP_BAD_REQUEST, $errors);
+        //     return $this->json($response, $response["status"]);
 
-        $response = $this->statusCode(Response::HTTP_BAD_REQUEST, $errors);
-        return $this->json($response, $response["status"]);
+        //     //return new JsonResponse(['error' => $errorMessages], 400);
+        // }
+
+        // Encode the password
+        $encodedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
+        $user->setPassword($encodedPassword);
+
+        //dd($user);
+
+        // Save the user to the database (you may need to adjust this based on your setup)
+        $entityManager = $this->getManager();
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+
+        // creation du token et initialisation dans le attribut password
+        $user->setToken($this->jWTManager->create($user));
+        $response = $this->statusCode(Response::HTTP_CREATED, $user);
+
+        return $this->json($response, $response["status"], [], ["groups" => "read:auth:item"]);
     }
-
-
-
 
 
 
@@ -303,4 +303,3 @@ class SecurityController extends AbstractController
         return $errors;
     }
 }
-
