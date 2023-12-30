@@ -20,9 +20,11 @@ class ExceptionController extends AbstractController
         if ($exception instanceof NotFoundHttpException || $exception instanceof MethodNotAllowedHttpException) {
             $response = $this->statusCode(Response::HTTP_NOT_FOUND);
         } elseif ($exception instanceof UniqueConstraintViolationException) {
-            $response = $this->statusCode(Response::HTTP_BAD_REQUEST, [], "Les données que vous souhaitez persister existe déjà dans la base de données");
+            $response = $this->statusCode(Response::HTTP_BAD_REQUEST, [], "Les données que vous souhaitez persister existent déjà dans la base de données");
         } elseif ($exception instanceof AccessDeniedException || $exception instanceof AccessDeniedHttpException) {
             $response = $this->statusCode(Response::HTTP_FORBIDDEN);
+        } elseif ($exception instanceof \ErrorException && strpos($exception->getMessage(), 'Trying to access array offset on value of type null') !== false) {
+            $response = $this->statusCode(Response::HTTP_BAD_REQUEST);
         } elseif ($exception instanceof \TypeError) {
             $response = $this->statusCode(Response::HTTP_BAD_REQUEST);
         } else {

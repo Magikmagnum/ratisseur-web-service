@@ -13,8 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -51,18 +50,15 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class SecurityController extends AbstractController
 {
-
-
     /**
      * @Route("/register", name="security_register", methods={"POST"})
      * 
-     *
      * @param Request $request
      * @param ValidatorInterface $validator
      * @param UserPasswordHasherInterface $passwordEncoder
      * @return JsonResponse
      */
-    public function register(Request $request, ValidatorInterface $validator, UserPasswordHasherInterface $passwordHasher): JsonResponse
+    public function register(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
         // Decode JSON data
         $data = json_decode($request->getContent(), true);
@@ -73,32 +69,19 @@ class SecurityController extends AbstractController
         $user->setRoles(['ROLE_USER']);
         $user->setPassword($data['password']);
 
-
-        // $errors = $validator->validate($user);
-
-        // if (count($errors) > 0) {
-        //     $errorMessages = [];
-        //     foreach ($errors as $error) {
-        //         $errorMessages[] = $error->getMessage();
-        //     }
-
-        //     $response = $this->statusCode(Response::HTTP_BAD_REQUEST, $errors);
-        //     return $this->json($response, $response["status"]);
-
-        //     //return new JsonResponse(['error' => $errorMessages], 400);
-        // }
+        // Valider l'entité User
+        if ($response = $this->validateEntity($user)) {
+            return $this->json($response, $response["status"]);
+        }
 
         // Encode the password
         $encodedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
         $user->setPassword($encodedPassword);
 
-        //dd($user);
-
         // Save the user to the database (you may need to adjust this based on your setup)
         $entityManager = $this->getManager();
         $entityManager->persist($user);
         $entityManager->flush();
-
 
         // creation du token et initialisation dans le attribut password
         $user->setToken($this->jWTManager->create($user));
@@ -107,199 +90,180 @@ class SecurityController extends AbstractController
         return $this->json($response, $response["status"], [], ["groups" => "read:auth:item"]);
     }
 
-
-
-
-
     /**
+     * Réinitialise les données de connecxion de l'utilisateur.
+     *
+     * @Route("/users/update", name="security_reset", methods={"PUT"})
      * 
-     * @Route("/reset", name="security_reset", methods={"PUT"})
-     * 
-     * @OA\Put(
-     *  path="/api/v1/reset",
-     *  tags={"Securities"},
-     *  @OA\RequestBody(
-     *      request="Register",
-     *      description="Corp de la requete",
-     *      required=true,
-     *      @OA\JsonContent(
-     *          @OA\Property(type="string", property="email", example="coucou@exemple.com"),
-     *          @OA\Property(type="string", property="newemail", example="coucou@exemple.com"),
-     *          @OA\Property(type="string", property="password", required=true, example="emileA15ans"),
-     *          @OA\Property(type="string", property="newpassword", required=true, example="emileA15ans"),
-     *      )
-     *  ), 
-     * 
-     *  @OA\Response(
-     *      response="200",
-     *      description="Modification du mot de passe",
-     *      @OA\JsonContent(ref="#/components/schemas/Security"),
-     *  ),
-     * 
-     *  @OA\Response( response="400", ref="#/components/responses/BadRequest" ),
-     *  @OA\Response( response="403", ref="#/components/responses/ForBidden" ),
-     *  @OA\Response( response="404", ref="#/components/responses/NotFound" ),
-     * 
-     * )
+     * @param Request $request
+     * @param UserPasswordHasherInterface $passwordHasher
+     * @return JsonResponse
      */
     public function reset(Request $request, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
+
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         $data = json_decode($request->getContent());
-        $errors = $this->getErrorAuth($request, $passwordHasher);
-        if (empty($errors)) {
 
-            $user = $this->getUser();
+        /** @var UserInterface $user */
+        $user = $this->getUser();
 
-            // on verifie si le nouveau couple email, passe word est valide
-            $userForCheck = new User();
-            isset($data->newemail) ? $userForCheck->setEmail($data->newemail) : $userForCheck->setEmail($user->getEmail());
-            isset($data->newpassword) ? $userForCheck->setPassword($data->newpassword) : $userForCheck->setPassword($user->getPassword());
-            $userForCheck->setRoles(['ROLE_USER']);
+        // Créer une instance pour vérifier les nouvelles données
+        $userForCheck = new User();
+        $userForCheck->setEmail($data->newemail ?? $user->getEmail());
+        $userForCheck->setPassword($data->newpassword ?? $user->getPassword());
+        $userForCheck->setRoles(['ROLE_USER']);
 
-
-            if (!$errors = $this->getErrorUser($userForCheck)) {
-
-                // on persiste les données dans la base de données.
-                isset($data->newemail) && $user->setEmail($data->newemail);
-                isset($data->newpassword) && $user->setPassword($passwordHasher->hashPassword($user, $data->newpassword));
-                $this->getManager()->persist($user);
-                $this->getManager()->flush();
-
-                // creation du token et initialisation dans le attribut password
-                $user->setToken($this->jWTManager->create($user));
-                $response = $this->statusCode(Response::HTTP_OK, $user);
-
-                return $this->json($response, $response["status"], [], ["groups" => "read:auth:item"]);
-            }
+        // Valider l'entité User
+        if ($response = $this->validateEntity($userForCheck)) {
+            return $this->json($response, $response["status"]);
         }
 
-        $response = $this->statusCode(Response::HTTP_BAD_REQUEST, $errors);
-        return $this->json($response, $response["status"]);
+        dd($userForCheck);
+
+        // Persistez les données dans la base de données.
+        if (isset($data->newemail)) {
+            $user->setEmail($data->newemail);
+        }
+
+        if (isset($data->newpassword)) {
+            $user->setPassword($passwordHasher->hashPassword($user, $data->newpassword));
+        }
+
+        $this->getManager()->persist($user);
+        $this->getManager()->flush();
+
+        // Créer le token et l'initialiser dans l'attribut password
+        $user->setToken($this->jWTManager->create($user));
+        $response = $this->statusCode(Response::HTTP_OK, $user);
+
+        return $this->json($response, $response["status"], [], ["groups" => "read:auth:item"]);
     }
 
+    /**
+     * Réinitialise le mot de passe de l'utilisateur.
+     *
+     * @Route("/users/recovery", name="security_reset_password", methods={"POST"})
+     * 
+     * @param Request $request
+     * @param UserPasswordHasherInterface $passwordHasher
+     * @param UserRepository $userRepository
+     * @return JsonResponse
+     */
+    public function resetPassword(Request $request, UserPasswordHasherInterface $passwordHasher, UserRepository $userRepository): JsonResponse
+    {
+        // Decode JSON data
+        $data = json_decode($request->getContent(), true);
+
+        // Récupérer les données de la requête
+        $email = $data['username'];
+        $password = $data['password'];
+        $repassword = $data['repassword'];
+
+        // Vérifier si le mot de passe et la confirmation du mot de passe sont identiques
+        if ($password !== $repassword) {
+            $response = $this->statusCode(Response::HTTP_UNPROCESSABLE_ENTITY, ['message' => 'Les mots de passe ne correspondent pas.']);
+            return $this->json($response, $response['status']);
+        }
 
 
+        // Récupérer l'utilisateur par email
+        $user = $userRepository->findOneBy(['email' => $email]);
 
+        // Vérifier si l'utilisateur existe
+        if (!$user) {
+            $response = $this->statusCode(Response::HTTP_NOT_FOUND, ['message' => 'Utilisateur non trouvé.']);
+            return $this->json($response, $response['status']);
+        }
+
+        // Valider l'entité User
+        $user->setPassword($password);
+        if ($response = $this->validateEntity($user)) {
+            return $this->json($response, $response['status']);
+        }
+
+        // Encoder et définir le nouveau mot de passe
+        $hashPassword = $passwordHasher->hashPassword($user, $password);
+        $user->setPassword($hashPassword);
+
+        // Enregistrer les modifications dans la base de données
+        $this->getManager()->flush();
+
+        // Créer le token et l'initialiser dans l'attribut password
+        $user->setToken($this->jWTManager->create($user));
+        $response = $this->statusCode(Response::HTTP_OK, $user);
+
+        return $this->json($response, $response['status'], [], ["groups" => "read:auth:item"]);
+    }
 
     /**
+     * Supprime l'utilisateur en fonction de l'e-mail et du mot de passe fournis.
      * 
-     * @Route("/delete", name="security_delete", methods={"DELETE"})
-     * 
-     * @OA\Delete(
-     *  path="/api/v1/delete",
-     *  tags={"Securities"},
-     *  @OA\RequestBody(
-     *      request="Register",
-     *      description="Corp de la requete",
-     *      required=true,
-     *      @OA\JsonContent(
-     *          @OA\Property(type="string", property="email", example="coucou@exemple.com"),
-     *          @OA\Property(type="string", property="password", required=true, example="emileA15ans"),
-     *      )
-     *  ), 
-     * 
-     *  @OA\Response(
-     *      response="200",
-     *      description="Suppression du mot de passe",
-     *      @OA\JsonContent(ref="#/components/schemas/Security"),
-     *  ),
-     * 
-     *  @OA\Response( response="400", ref="#/components/responses/BadRequest" ),
-     *  @OA\Response( response="403", ref="#/components/responses/ForBidden" ),
-     *  @OA\Response( response="404", ref="#/components/responses/NotFound" ),
-     * 
-     * )
+     * @Route("/users", name="security_delete", methods={"DELETE"})
+     *
+     * @param Request $request
+     * @param UserPasswordHasherInterface $passwordHasher
+     * @param UserRepository $userRepository
+     * @return JsonResponse
      */
     public function delete(Request $request, UserPasswordHasherInterface $passwordHasher, UserRepository $userRepository): JsonResponse
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $errors = $this->getErrorAuth($request, $passwordHasher, false);
-        if (empty($errors)) {
 
-            $user = $this->getUser();
-            $userRepository->remove($user, true);
+        // Decode JSON data
+        $data = json_decode($request->getContent(), true);
 
-            $response = $this->statusCode(Response::HTTP_OK, []);
-            return $this->json($response, $response["status"], [], ["groups" => "read:auth:item"]);
+
+        // Récupérer les données de la requête
+        $email = $data['username'];
+        $password = $data['password'];
+
+        // Récupérer l'utilisateur par email
+        $user = $userRepository->findOneBy(['email' => $email]);
+
+        // Vérifier si l'utilisateur existe
+        if (!$user) {
+            $response = $this->statusCode(Response::HTTP_NOT_FOUND, ['message' => 'Utilisateur non trouvé.']);
+            return $this->json($response, $response['status']);
         }
 
-        $response = $this->statusCode(Response::HTTP_BAD_REQUEST, $errors);
-        return $this->json($response, $response["status"]);
-    }
-
-
-
-
-
-    /**
-     * la methode qui valide l'object user.
-     *
-     * @param UserInterface $user
-     * @return array|false
-     */
-    private function getErrorUser($user): array | null
-    {
-        $errors = [];
-
-        //verification des erreurs email
-        $email = $user->getEmail();
-        !isset($email) && $errors[] = ['path' => "email", 'message' => "Champs obligatoir"];
-
-        //verification des erreur sur le nouveau mot de passe
-        $errorPassword = "Champs obligatoir";
-        $password = $user->getPassword();
-        if (!isset($password) || $errorPassword = $this->check->validatePassword($user->getPassword())) {
-            $errors[] = ['path' => "password", 'message' => $errorPassword];
+        // Vérifier si le mot de passe fourni correspond au mot de passe de l'utilisateur
+        if (!$passwordHasher->isPasswordValid($user, $password)) {
+            $response = $this->statusCode(Response::HTTP_UNAUTHORIZED, ['message' => 'Mot de passe incorrect.']);
+            return $this->json($response, $response['status']);
         }
 
-        if (empty($errors)) {
-            if (!$errors = $this->getOrmValidationErrors($user, $errors)) {
-                return null;
-            }
+        // Vérifier si l'utilisateur à supprimer est le même que l'utilisateur actuellement authentifié
+        $currentUser = $this->getUser();
+        if ($user->getId() !== $currentUser->getId()) {
+            throw new AccessDeniedException('Vous n\'êtes pas autorisé à supprimer cet utilisateur.');
         }
-        return $errors;
+
+        // Supprimer l'utilisateur de la base de données
+        $entityManager = $this->getManager();
+        $entityManager->remove($user);
+        $entityManager->flush();
+
+        $response = $this->statusCode(Response::HTTP_OK, ['message' => 'Utilisateur supprimé avec succès.']);
+        return $this->json($response, $response['status']);
     }
 
 
     /**
-     * Undocumented function
+     * List Users
      *
-     * @param Request $request
-     * @param UserPasswordHasherInterface $passwordHasher
-     * @param boolean $flag
-     * @return array|null
+     * Cette méthode permet de récupérer la liste des utilisateurs.
+     *
+     * @Route("/users", name="list_users", methods={"GET"})
+     * 
+     * @param UserRepository $userRepository Le repository des utilisateurs.
+     * @return JsonResponse La réponse au format JSON contenant la liste des utilisateurs.
      */
-    private function getErrorAuth(Request $request, UserPasswordHasherInterface $passwordHasher, $flag = true): array|null
+    public function list(UserRepository $userRepository): JsonResponse
     {
-        $data = json_decode($request->getContent());
-        $errors = [];
-
-        $flag ? $path = 'old' : $path = '';
-
-        //recupere l'utilisateur courant
-        $user = $this->getUser();
-        // on verifie si email de l'utilisateur est le meme que l'email passer en parametre
-        $oldEmail = $user->getEmail();
-
-        if (isset($data->email)) {
-            !($oldEmail == $data->email) && $errors[] = ['path' => $path . "email", 'message' => "email incorrect"];
-        } else {
-            $errors[] = ['path' => $path . "email", 'message' => "Champs obligatoir"];
-        }
-
-        //on verifie si le mot de passe de l'utilisateur est le meme que le mot de passe passer en parametre
-        if (isset($data->password)) {
-            !$passwordHasher->isPasswordValid($user, $data->password) &&  $errors[] = ['path' => $path . "password", 'message' => "mot de passe incorrect"];
-        } else {
-            $errors[] = ['path' => $path . "password", 'message' => "Champs obligatoir"];
-        }
-
-        if (empty($errors)) {
-            return [];
-        }
-
-        return $errors;
+        $users = $userRepository->findAll();
+        $response = $this->statusCode(Response::HTTP_CREATED, $users);
+        return $this->json($response, $response["status"], [], ["groups" => "read:auth:list"]);
     }
 }
