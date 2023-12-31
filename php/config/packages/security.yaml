@@ -38,6 +38,10 @@ security:
             # https://symfony.com/doc/current/security/impersonating_user.html
             # switch_user: true
 
+        role_hierarchy:
+            ROLE_ADMIN:       ROLE_USER
+            ROLE_SUPER_ADMIN: ROLE_ADMIN
+            
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
@@ -45,11 +49,6 @@ security:
         - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/api/v1/register, roles: IS_AUTHENTICATED_ANONYMOUSLY, methods: POST }
         - { path: ^/api/v1/login, roles: IS_AUTHENTICATED_ANONYMOUSLY, methods: POST }
-        # - { path: ^/api/v1/analyse, roles: IS_AUTHENTICATED_ANONYMOUSLY, methods: POST }
-        # - { path: ^/api/v1/croquette, roles: IS_AUTHENTICATED_ANONYMOUSLY, methods: GET }
-        # - { path: ^/api/v1, roles: IS_AUTHENTICATED_FULLY }
-        # - { path: ^/api/v1/croquette_by_brand, roles: IS_AUTHENTICATED_ANONYMOUSLY, methods: GET }
-        # - { path: ^/api/v1/brand, roles: IS_AUTHENTICATED_ANONYMOUSLY, methods: GET }
 
 when@test:
     security:
@@ -63,8 +62,3 @@ when@test:
               cost: 4 # Lowest possible value for bcrypt
               time_cost: 3 # Lowest possible value for argon
               memory_cost: 10 # Lowest possible value for argon
-
-# - { path: ^/api/v1/register, roles: PUBLIC_ACCESS }
-#         - { path: ^/api/v1/login, roles: PUBLIC_ACCESS }
-#         - { path: ^/api/v1, roles: PUBLIC_ACCESS, methods: GET }
-#         - { path: ^/api/v1,       roles: ROLE_USER }
