@@ -263,9 +263,7 @@ class SecurityController extends AbstractController
     public function list(UserRepository $userRepository): JsonResponse
     {
         $users = $userRepository->findAll();
-        $response = $this->statusCode(Response::HTTP_CREATED, $users);
+        $response = $this->statusCode(Response::HTTP_OK, $users);
         return $this->json($response, $response["status"], [], ["groups" => "read:auth:list"]);
     }
 }
-
-

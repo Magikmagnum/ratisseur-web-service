@@ -7,25 +7,17 @@ namespace App\Controller;
 use App\Entity\Identite;
 use App\Form\IdentiteType;
 use App\Repository\IdentiteRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use App\Service\ResponseService;
 
 /**
  * @Route("/identite")
  */
 class IdentiteController extends AbstractController
 {
-    private ResponseService $responseService;
-
-    public function __construct(ResponseService $responseService)
-    {
-        $this->responseService = $responseService;
-    }
-
     /**
      * @Route("/", name="identite_index", methods={"GET"})
      */
@@ -33,7 +25,8 @@ class IdentiteController extends AbstractController
     {
         // Cette action ne nécessite pas d'autorisation spécifique
         $identites = $identiteRepository->findAll();
-        return $this->json($this->responseService->success($identites));
+        $response = $this->statusCode(Response::HTTP_OK, $identites);
+        return $this->json($response, $response["status"], [], ["groups" => "read:identite:list"]);
     }
 
     /**
@@ -43,33 +36,44 @@ class IdentiteController extends AbstractController
     public function new(Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
+
         $identite = new Identite();
 
         // Ici, vous devriez attribuer l'utilisateur actuel à l'identité, par exemple, si l'utilisateur est connecté.
         // $identite->setUser($this->getUser());
 
+        // Créer le formulaire en utilisant IdentiteType
         $form = $this->createForm(IdentiteType::class, $identite);
+        // Soumettre les données au formulaire
         $form->submit($data);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($identite);
-            $entityManager->flush();
-
-            return $this->json($this->responseService->success($identite));
+        // Si des erreurs de validation sont trouvées, renvoyer une réponse avec les erreurs
+        if ($validationErrors = $this->validateEntity($identite)) {
+            return $this->json($validationErrors, $validationErrors['status']);
         }
 
-        return $this->json($this->responseService->error($form->getErrors(true)));
+        // Sauvegarder l'entité en base de données
+        $entityManager = $this->getManager();
+        $entityManager->persist($identite);
+        $entityManager->flush();
+
+        // Répondre avec succès
+        $response = $this->statusCode(Response::HTTP_CREATED, $identite);
+        return $this->json($response, $response["status"], [], ["groups" => "read:identite:iteme"]);
     }
 
     /**
      * @Route("/{id}", name="identite_show", methods={"GET"})
+     * @IsGranted("ROLE_USER")
      */
     public function show(Identite $identite): Response
     {
-        // Cette action ne nécessite pas d'autorisation spécifique pour la visualisation
-        return $this->json($this->responseService->success($identite));
+        // Vous pouvez personnaliser la logique d'affichage ici
+        // Répondre avec succès
+        $response = $this->statusCode(Response::HTTP_OK, $identite);
+        return $this->json($response, $response["status"], [], ["groups" => "read:identite:item"]);
     }
+
 
     /**
      * @Route("/{id}/edit", name="identite_edit", methods={"PUT"})
@@ -82,18 +86,25 @@ class IdentiteController extends AbstractController
         //     return $this->json($this->responseService->error('Vous n\'avez pas la permission de modifier cette identité.'));
         // }
 
+        // Convertir le contenu JSON en tableau associatif
         $data = json_decode($request->getContent(), true);
+
+        // Soumettre les données au formulaire
         $form = $this->createForm(IdentiteType::class, $identite);
-        $form->submit($data);
+        $form->submit($data, false);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->flush();
-
-            return $this->json($this->responseService->success($identite));
+        // Valider l'entité
+        if ($validationErrors = $this->validateEntity($identite)) {
+            // Si des erreurs de validation sont trouvées, renvoyer une réponse avec les erreurs
+            return $this->json($validationErrors, $validationErrors['status']);
         }
 
-        return $this->json($this->responseService->error($form->getErrors(true)));
+        // Sauvegarder l'entité modifiée en base de données
+        $this->getManager()->flush();
+
+        // Répondre avec succès
+        $response = $this->statusCode(Response::HTTP_OK, $identite);
+        return $this->json($response, $response["status"], [], ["groups" => "read:identite:item"]);
     }
 
     /**
@@ -107,10 +118,12 @@ class IdentiteController extends AbstractController
         //     return $this->json($this->responseService->error('Vous n\'avez pas la permission de supprimer cette identité.'));
         // }
 
-        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager = $this->getManager();
         $entityManager->remove($identite);
         $entityManager->flush();
 
-        return $this->json($this->responseService->success(['message' => 'Utilisateur supprimé avec succès.']));
+        // Répondre avec succès
+        $response = $this->statusCode(Response::HTTP_NO_CONTENT, $identite);
+        return $this->json($response, $response['status']);
     }
 }
