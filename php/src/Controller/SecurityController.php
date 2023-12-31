@@ -267,3 +267,5 @@ class SecurityController extends AbstractController
         return $this->json($response, $response["status"], [], ["groups" => "read:auth:list"]);
     }
 }
+
+
