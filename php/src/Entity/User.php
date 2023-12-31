@@ -63,6 +63,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['read:auth:item'])]
     private ?string $token = null;
 
+    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?Identite $yes = null;
+
 
     public function getId(): ?int
     {
@@ -142,6 +145,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setToken(?string $token): self
     {
         $this->token = $token;
+
+        return $this;
+    }
+
+    public function getYes(): ?Identite
+    {
+        return $this->yes;
+    }
+
+    public function setYes(?Identite $yes): self
+    {
+        // unset the owning side of the relation if necessary
+        if ($yes === null && $this->yes !== null) {
+            $this->yes->setUser(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($yes !== null && $yes->getUser() !== $this) {
+            $yes->setUser($this);
+        }
+
+        $this->yes = $yes;
 
         return $this;
     }

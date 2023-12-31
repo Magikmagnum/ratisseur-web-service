@@ -28,6 +28,9 @@ class Identite
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $modifyAt = null;
 
+    #[ORM\OneToOne(inversedBy: 'yes', cascade: ['persist', 'remove'])]
+    private ?User $user = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -89,6 +92,18 @@ class Identite
     public function setModifyAt(?\DateTimeImmutable $modifyAt): self
     {
         $this->modifyAt = $modifyAt;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }
