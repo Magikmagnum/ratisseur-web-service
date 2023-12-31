@@ -40,7 +40,7 @@ class IdentiteController extends AbstractController
         $identite = new Identite();
 
         // Ici, vous devriez attribuer l'utilisateur actuel à l'identité, par exemple, si l'utilisateur est connecté.
-        // $identite->setUser($this->getUser());
+        $identite->setUser($this->getUser());
 
         // Créer le formulaire en utilisant IdentiteType
         $form = $this->createForm(IdentiteType::class, $identite);
