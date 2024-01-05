@@ -43,9 +43,6 @@ class IdentiteController extends AbstractController
         $identite->setNaissanceAt(new \DateTimeImmutable($data['naissanceAt']));
         $identite->setUser($this->getUser());
 
-
-        // dd($identite);
-
         // Si des erreurs de validation sont trouvées, renvoyer une réponse avec les erreurs
         if ($validationErrors = $this->validateEntity($identite)) {
             return $this->json($validationErrors, $validationErrors['status']);
@@ -72,7 +69,6 @@ class IdentiteController extends AbstractController
         $response = $this->statusCode(Response::HTTP_OK, $identite);
         return $this->json($response, $response["status"], [], ["groups" => "read:identite:item"]);
     }
-
 
     /**
      * @Route("/{id}", name="identite_edit", methods={"PUT"})
