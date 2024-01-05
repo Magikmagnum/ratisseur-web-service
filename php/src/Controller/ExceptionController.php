@@ -11,12 +11,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Serializer\Exception\CircularReferenceException;
 
 class ExceptionController extends AbstractController
 {
     public function catchException(\Throwable $exception)
     {
-
         if ($exception instanceof NotFoundHttpException || $exception instanceof MethodNotAllowedHttpException) {
             $response = $this->statusCode(Response::HTTP_NOT_FOUND);
         } elseif ($exception instanceof UniqueConstraintViolationException) {
@@ -27,6 +27,10 @@ class ExceptionController extends AbstractController
             $response = $this->statusCode(Response::HTTP_BAD_REQUEST);
         } elseif ($exception instanceof \TypeError) {
             $response = $this->statusCode(Response::HTTP_BAD_REQUEST);
+        } elseif ($exception instanceof \Exception && strpos($exception->getMessage(), 'Failed to parse time string') !== false) {
+            $response = $this->statusCode(Response::HTTP_BAD_REQUEST, [], 'Erreur de format de date.');
+        } elseif ($exception instanceof CircularReferenceException) {
+            $response = $this->statusCode(Response::HTTP_INTERNAL_SERVER_ERROR, [], 'CircularReferenceException.');
         } else {
             $response = [
                 "success" => false,

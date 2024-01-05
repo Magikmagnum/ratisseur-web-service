@@ -120,8 +120,6 @@ class SecurityController extends AbstractController
             return $this->json($response, $response["status"]);
         }
 
-        dd($userForCheck);
-
         // Persistez les données dans la base de données.
         if (isset($data->newemail)) {
             $user->setEmail($data->newemail);

@@ -19,7 +19,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class IdentiteController extends AbstractController
 {
     /**
-     * @Route("/", name="identite_index", methods={"GET"})
+     * @Route("", name="identite_index", methods={"GET"})
      */
     public function index(IdentiteRepository $identiteRepository): Response
     {
@@ -30,22 +30,21 @@ class IdentiteController extends AbstractController
     }
 
     /**
-     * @Route("/new", name="identite_new", methods={"POST"})
+     * @Route("", name="identite_new", methods={"POST"})
      * @IsGranted("ROLE_USER")  // Autorisation pour l'ajout
      */
-    public function new(Request $request): Response
+    public function add(Request $request): Response
     {
         $data = json_decode($request->getContent(), true);
 
         $identite = new Identite();
-
-        // Ici, vous devriez attribuer l'utilisateur actuel à l'identité, par exemple, si l'utilisateur est connecté.
+        $identite->setSexe($data['sexe']);
+        $identite->setNom($data['nom']);
+        $identite->setNaissanceAt(new \DateTimeImmutable($data['naissanceAt']));
         $identite->setUser($this->getUser());
 
-        // Créer le formulaire en utilisant IdentiteType
-        $form = $this->createForm(IdentiteType::class, $identite);
-        // Soumettre les données au formulaire
-        $form->submit($data);
+
+        // dd($identite);
 
         // Si des erreurs de validation sont trouvées, renvoyer une réponse avec les erreurs
         if ($validationErrors = $this->validateEntity($identite)) {
@@ -59,7 +58,7 @@ class IdentiteController extends AbstractController
 
         // Répondre avec succès
         $response = $this->statusCode(Response::HTTP_CREATED, $identite);
-        return $this->json($response, $response["status"], [], ["groups" => "read:identite:iteme"]);
+        return $this->json($response, $response["status"], [], ["groups" => "read:identite:item"]);
     }
 
     /**
@@ -76,15 +75,16 @@ class IdentiteController extends AbstractController
 
 
     /**
-     * @Route("/{id}/edit", name="identite_edit", methods={"PUT"})
+     * @Route("/{id}", name="identite_edit", methods={"PUT"})
      * @IsGranted("EDIT", subject="identite")  // Autorisation pour la modification
      */
     public function edit(Request $request, Identite $identite): Response
     {
         // Ici, vous devriez vérifier si l'utilisateur actuel est autorisé à modifier cette identité.
-        // if (!$this->isGranted('EDIT', $identite)) {
-        //     return $this->json($this->responseService->error('Vous n\'avez pas la permission de modifier cette identité.'));
-        // }
+        if (!$this->isGranted('EDIT', $identite)) {
+            $response = $this->statusCode(Response::HTTP_FORBIDDEN, 'Vous n\'avez pas la permission de modifier cette identité.');
+            return $this->json($response, $response['status']);
+        }
 
         // Convertir le contenu JSON en tableau associatif
         $data = json_decode($request->getContent(), true);
@@ -110,20 +110,22 @@ class IdentiteController extends AbstractController
     /**
      * @Route("/{id}", name="identite_delete", methods={"DELETE"})
      * @IsGranted("DELETE", subject="identite")  // Autorisation pour la suppression
+     * @IsGranted("ROLE_USER")ROLE_SUPER_ADMIN
      */
     public function delete(Identite $identite): Response
     {
         // Ici, vous devriez vérifier si l'utilisateur actuel est autorisé à supprimer cette identité.
-        // if (!$this->isGranted('DELETE', $identite)) {
-        //     return $this->json($this->responseService->error('Vous n\'avez pas la permission de supprimer cette identité.'));
-        // }
+        if (!$this->isGranted('DELETE', $identite)) {
+            $response = $this->statusCode(Response::HTTP_FORBIDDEN, 'Vous n\'avez pas la permission de modifier cette identité.');
+            return $this->json($response, $response['status']);
+        }
 
         $entityManager = $this->getManager();
         $entityManager->remove($identite);
         $entityManager->flush();
 
         // Répondre avec succès
-        $response = $this->statusCode(Response::HTTP_NO_CONTENT, $identite);
+        $response = $this->statusCode(Response::HTTP_OK);
         return $this->json($response, $response['status']);
     }
 }

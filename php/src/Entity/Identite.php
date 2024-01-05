@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\IdentiteRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: IdentiteRepository::class)]
 class Identite
@@ -11,18 +13,27 @@ class Identite
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['read:identite:list', 'read:identite:item'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le champ 'nom' ne doit pas être vide.")]
+    #[Groups(['read:identite:list', 'read:identite:item'])]
     private ?string $nom = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Choice(
+        choices: [true, false],
+        message: "La valeur du champ 'sexe' doit être soit 'true' pour masculin, soit 'false' pour féminin."
+    )]
+    #[Groups(['read:identite:list', 'read:identite:item'])]
     private ?bool $sexe = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['read:identite:list', 'read:identite:item'])]
     private ?\DateTimeImmutable $naissanceAt = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -30,6 +41,14 @@ class Identite
 
     #[ORM\OneToOne(inversedBy: 'yes', cascade: ['persist', 'remove'])]
     private ?User $user = null;
+
+    // Ajout du constructeur
+    public function __construct()
+    {
+        // Convertir la chaîne de date en objet DateTimeImmutable
+        $createdAt = new \DateTimeImmutable();
+        $this->setCreatedAt($createdAt);
+    }
 
     public function getId(): ?int
     {
