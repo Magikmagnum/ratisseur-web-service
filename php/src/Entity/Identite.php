@@ -18,7 +18,7 @@ class Identite
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Le champ 'nom' ne doit pas être vide.")]
-    #[Groups(['read:identite:list', 'read:identite:item'])]
+    #[Groups(['read:identite:list', 'read:identite:item', 'read:competence:list', 'read:competence:item'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -26,11 +26,11 @@ class Identite
         choices: [true, false],
         message: "La valeur du champ 'sexe' doit être soit 'true' pour masculin, soit 'false' pour féminin."
     )]
-    #[Groups(['read:identite:list', 'read:identite:item'])]
+    #[Groups(['read:identite:list', 'read:identite:item', 'read:competence:list', 'read:competence:item'])]
     private ?bool $sexe = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['read:identite:list', 'read:identite:item'])]
+    #[Groups(['read:identite:list', 'read:identite:item', 'read:competence:list', 'read:competence:item'])]
     private ?\DateTimeImmutable $naissanceAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -39,7 +39,7 @@ class Identite
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $modifyAt = null;
 
-    #[ORM\OneToOne(inversedBy: 'yes', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'identite', cascade: ['persist', 'remove'])]
     private ?User $user = null;
 
     // Ajout du constructeur

@@ -67,7 +67,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $token = null;
 
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
-    private ?Identite $yes = null;
+    #[Groups(['read:competence:list', 'read:competence:item'])]
+    private ?Identite $identite = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Competences::class)]
     private Collection $competences;
@@ -160,24 +161,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getYes(): ?Identite
+    public function getIdentite(): ?Identite
     {
-        return $this->yes;
+        return $this->identite;
     }
 
-    public function setYes(?Identite $yes): self
+    public function setIdentite(?Identite $identite): self
     {
         // unset the owning side of the relation if necessary
-        if ($yes === null && $this->yes !== null) {
-            $this->yes->setUser(null);
+        if ($identite === null && $this->identite !== null) {
+            $this->identite->setUser(null);
         }
 
         // set the owning side of the relation if necessary
-        if ($yes !== null && $yes->getUser() !== $this) {
-            $yes->setUser($this);
+        if ($identite !== null && $identite->getUser() !== $this) {
+            $identite->setUser($this);
         }
 
-        $this->yes = $yes;
+        $this->identite = $identite;
 
         return $this;
     }
