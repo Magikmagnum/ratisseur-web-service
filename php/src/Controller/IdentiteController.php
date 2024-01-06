@@ -37,25 +37,33 @@ class IdentiteController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        $identite = new Identite();
-        $identite->setSexe($data['sexe']);
-        $identite->setNom($data['nom']);
-        $identite->setNaissanceAt(new \DateTimeImmutable($data['naissanceAt']));
-        $identite->setUser($this->getUser());
+        if (isset($data['label']) && !empty($data['label'])) {
 
-        // Si des erreurs de validation sont trouvées, renvoyer une réponse avec les erreurs
-        if ($validationErrors = $this->validateEntity($identite)) {
-            return $this->json($validationErrors, $validationErrors['status']);
+            $erreurs = [];
+
+            $identite = new Identite();
+            $data['sexe'] ? $identite->setSexe($data['sexe']) : $erreurs[] = ['field' => 'sexe', 'message' => 'Ce champ est obligatoire'];
+            $data['nom'] && $identite->setNom($data['nom']);
+            $data['naissanceAt'] && $identite->setNaissanceAt(new \DateTimeImmutable($data['naissanceAt']));
+            $identite->setUser($this->getUser());
+
+            // Si des erreurs de validation sont trouvées, renvoyer une réponse avec les erreurs
+            if ($validationErrors = $this->validateEntity($identite, $erreurs)) {
+                return $this->json($validationErrors, $validationErrors['status']);
+            }
+
+            // Sauvegarder l'entité en base de données
+            $entityManager = $this->getManager();
+            $entityManager->persist($identite);
+            $entityManager->flush();
+
+            // Répondre avec succès
+            $response = $this->statusCode(Response::HTTP_CREATED, $identite);
+            return $this->json($response, $response["status"], [], ["groups" => "read:identite:item"]);
         }
 
-        // Sauvegarder l'entité en base de données
-        $entityManager = $this->getManager();
-        $entityManager->persist($identite);
-        $entityManager->flush();
-
-        // Répondre avec succès
-        $response = $this->statusCode(Response::HTTP_CREATED, $identite);
-        return $this->json($response, $response["status"], [], ["groups" => "read:identite:item"]);
+        $response = $this->statusCode(Response::HTTP_BAD_REQUEST);
+        return $this->json($response, $response['status']);
     }
 
     /**
@@ -85,22 +93,28 @@ class IdentiteController extends AbstractController
         // Convertir le contenu JSON en tableau associatif
         $data = json_decode($request->getContent(), true);
 
-        // Soumettre les données au formulaire
-        $form = $this->createForm(IdentiteType::class, $identite);
-        $form->submit($data, false);
+        if (isset($data)) {
 
-        // Valider l'entité
-        if ($validationErrors = $this->validateEntity($identite)) {
-            // Si des erreurs de validation sont trouvées, renvoyer une réponse avec les erreurs
-            return $this->json($validationErrors, $validationErrors['status']);
+            $data['sexe'] && $identite->setSexe($data['sexe']);
+            $data['nom'] && $identite->setNom($data['nom']);
+            $data['naissanceAt'] && $identite->setNaissanceAt(new \DateTimeImmutable($data['naissanceAt']));
+
+            // Valider l'entité
+            if ($validationErrors = $this->validateEntity($identite)) {
+                // Si des erreurs de validation sont trouvées, renvoyer une réponse avec les erreurs
+                return $this->json($validationErrors, $validationErrors['status']);
+            }
+
+            // Sauvegarder l'entité modifiée en base de données
+            $this->getManager()->flush();
+
+            // Répondre avec succès
+            $response = $this->statusCode(Response::HTTP_OK, $identite);
+            return $this->json($response, $response["status"], [], ["groups" => "read:identite:item"]);
         }
 
-        // Sauvegarder l'entité modifiée en base de données
-        $this->getManager()->flush();
-
-        // Répondre avec succès
-        $response = $this->statusCode(Response::HTTP_OK, $identite);
-        return $this->json($response, $response["status"], [], ["groups" => "read:identite:item"]);
+        $response = $this->statusCode(Response::HTTP_BAD_REQUEST);
+        return $this->json($response, $response['status']);
     }
 
     /**
