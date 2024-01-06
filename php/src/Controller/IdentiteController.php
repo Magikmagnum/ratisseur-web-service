@@ -5,7 +5,6 @@
 namespace App\Controller;
 
 use App\Entity\Identite;
-use App\Form\IdentiteType;
 use App\Repository\IdentiteRepository;
 use App\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
