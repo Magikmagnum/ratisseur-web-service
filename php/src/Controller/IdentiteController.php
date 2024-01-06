@@ -31,7 +31,7 @@ class IdentiteController extends AbstractController
 
     /**
      * @Route("", name="identite_new", methods={"POST"})
-     * @IsGranted("ROLE_USER")  // Autorisation pour l'ajout
+     * @IsGranted("ROLE_USER")
      */
     public function add(Request $request): Response
     {
@@ -105,8 +105,8 @@ class IdentiteController extends AbstractController
 
     /**
      * @Route("/{id}", name="identite_delete", methods={"DELETE"})
-     * @IsGranted("DELETE", subject="identite")  // Autorisation pour la suppression
-     * @IsGranted("ROLE_USER")ROLE_SUPER_ADMIN
+     * @IsGranted("DELETE", subject="identite")
+     * @IsGranted("ROLE_USER")
      */
     public function delete(Identite $identite): Response
     {

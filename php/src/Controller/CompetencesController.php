@@ -57,7 +57,6 @@ class CompetencesController extends AbstractController
         return $this->json($response, $response['status']);
     }
 
-
     /**
      * @Route("/{id}", name="competences_show", methods={"GET"})
      * @IsGranted("ROLE_USER")
@@ -74,6 +73,12 @@ class CompetencesController extends AbstractController
      */
     public function edit(Request $request, Competences $competence): Response
     {
+        // Ici, nous vérifions si l'utilisateur actuel est autorisé à modifier cette identité.
+        if (!$this->isGranted('EDIT', $competence)) {
+            $response = $this->statusCode(Response::HTTP_FORBIDDEN, 'Vous n\'avez pas la permission de modifier cette identité.');
+            return $this->json($response, $response['status']);
+        }
+
         $data = json_decode($request->getContent(), true);
 
         if (isset($data)) {
@@ -102,6 +107,12 @@ class CompetencesController extends AbstractController
      */
     public function delete(Competences $competence): Response
     {
+        // Ici, nous vérifions si l'utilisateur actuel est autorisé à modifier cette identité.
+        if (!$this->isGranted('DELETE', $competence)) {
+            $response = $this->statusCode(Response::HTTP_FORBIDDEN, 'Vous n\'avez pas la permission de modifier cette identité.');
+            return $this->json($response, $response['status']);
+        }
+
         $entityManager = $this->getManager();
         $entityManager->remove($competence);
         $entityManager->flush();
