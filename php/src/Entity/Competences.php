@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CompetencesRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -36,12 +38,16 @@ class Competences
     #[Groups(['read:competence:list', 'read:competence:item'])]
     private ?user $user = null;
 
+    #[ORM\OneToMany(mappedBy: 'competence', targetEntity: Realisations::class, orphanRemoval: true)]
+    private Collection $realisations;
+
     // Ajout du constructeur
     public function __construct()
     {
         // Convertir la chaîne de date en objet DateTimeImmutable
         $createdAt = new \DateTimeImmutable();
         $this->setCreatedAt($createdAt);
+        $this->realisations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -105,6 +111,36 @@ class Competences
     public function setUser(?user $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Realisations>
+     */
+    public function getRealisations(): Collection
+    {
+        return $this->realisations;
+    }
+
+    public function addRealisation(Realisations $realisation): self
+    {
+        if (!$this->realisations->contains($realisation)) {
+            $this->realisations->add($realisation);
+            $realisation->setCompetence($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRealisation(Realisations $realisation): self
+    {
+        if ($this->realisations->removeElement($realisation)) {
+            // set the owning side to null (unless already changed)
+            if ($realisation->getCompetence() === $this) {
+                $realisation->setCompetence(null);
+            }
+        }
 
         return $this;
     }

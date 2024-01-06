@@ -33,6 +33,11 @@ class Realisations
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $modifyAt = null;
 
+    #[ORM\ManyToOne(inversedBy: 'realisations')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['read:realisation:item'])]
+    private ?Competences $competence = null;
+
     // Ajout du constructeur
     public function __construct()
     {
@@ -90,6 +95,18 @@ class Realisations
     public function setModifyAt(?\DateTimeImmutable $modifyAt): self
     {
         $this->modifyAt = $modifyAt;
+
+        return $this;
+    }
+
+    public function getCompetence(): ?Competences
+    {
+        return $this->competence;
+    }
+
+    public function setCompetence(?Competences $competence): self
+    {
+        $this->competence = $competence;
 
         return $this;
     }
