@@ -38,6 +38,9 @@ class Realisations
     #[Groups(['read:realisation:item'])]
     private ?Competences $competence = null;
 
+    #[ORM\ManyToOne(inversedBy: 'realisation')]
+    private ?Experiences $experience = null;
+
     // Ajout du constructeur
     public function __construct()
     {
@@ -107,6 +110,18 @@ class Realisations
     public function setCompetence(?Competences $competence): self
     {
         $this->competence = $competence;
+
+        return $this;
+    }
+
+    public function getExperience(): ?Experiences
+    {
+        return $this->experience;
+    }
+
+    public function setExperience(?Experiences $experience): self
+    {
+        $this->experience = $experience;
 
         return $this;
     }
