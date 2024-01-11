@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CompetencesRepository::class)]
@@ -19,10 +18,9 @@ class Competences
     #[Groups(['read:competence:list', 'read:competence:item'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "Le champ 'label' ne doit pas être vide.")]
+    #[ORM\ManyToOne(inversedBy: 'competences')]
     #[Groups(['read:competence:list', 'read:competence:item'])]
-    private ?string $label = null;
+    private ?CompetencesListe $label = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['read:competence:list', 'read:competence:item'])]
@@ -53,18 +51,6 @@ class Competences
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getLabel(): ?string
-    {
-        return $this->label;
-    }
-
-    public function setLabel(string $label): self
-    {
-        $this->label = $label;
-
-        return $this;
     }
 
     public function getDescription(): ?string
@@ -141,6 +127,18 @@ class Competences
                 $realisation->setCompetence(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getLabel(): ?CompetencesListe
+    {
+        return $this->label;
+    }
+
+    public function setLabel(?CompetencesListe $label): static
+    {
+        $this->label = $label;
 
         return $this;
     }
