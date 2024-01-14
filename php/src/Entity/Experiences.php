@@ -37,6 +37,13 @@ class Experiences
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $modifyAt = null;
 
+    #[ORM\ManyToOne(inversedBy: 'experience')]
+    private ?Entreprises $yes = null;
+
+    #[ORM\ManyToOne(inversedBy: 'experiences')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
     public function __construct()
     {
         $this->realisations = new ArrayCollection();
@@ -145,6 +152,30 @@ class Experiences
     public function setModifyAt(?\DateTimeImmutable $modifyAt): self
     {
         $this->modifyAt = $modifyAt;
+
+        return $this;
+    }
+
+    public function getYes(): ?Entreprises
+    {
+        return $this->yes;
+    }
+
+    public function setYes(?Entreprises $yes): static
+    {
+        $this->yes = $yes;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

@@ -35,6 +35,13 @@ class Formations
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $modifyAt = null;
 
+    #[ORM\ManyToOne(inversedBy: 'formation')]
+    private ?Entreprises $entreprise = null;
+
+    #[ORM\ManyToOne(inversedBy: 'formations')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -120,6 +127,30 @@ class Formations
     public function setModifyAt(?\DateTimeImmutable $modifyAt): static
     {
         $this->modifyAt = $modifyAt;
+
+        return $this;
+    }
+
+    public function getEntreprise(): ?Entreprises
+    {
+        return $this->entreprise;
+    }
+
+    public function setEntreprise(?Entreprises $entreprise): static
+    {
+        $this->entreprise = $entreprise;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

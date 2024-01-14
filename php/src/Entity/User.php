@@ -73,9 +73,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Competences::class)]
     private Collection $competences;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Formations::class)]
+    private Collection $formations;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Experiences::class)]
+    private Collection $experiences;
+
     public function __construct()
     {
         $this->competences = new ArrayCollection();
+        $this->formations = new ArrayCollection();
+        $this->experiences = new ArrayCollection();
     }
 
 
@@ -207,6 +215,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($competence->getUser() === $this) {
                 $competence->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Formations>
+     */
+    public function getFormations(): Collection
+    {
+        return $this->formations;
+    }
+
+    public function addFormation(Formations $formation): static
+    {
+        if (!$this->formations->contains($formation)) {
+            $this->formations->add($formation);
+            $formation->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFormation(Formations $formation): static
+    {
+        if ($this->formations->removeElement($formation)) {
+            // set the owning side to null (unless already changed)
+            if ($formation->getUser() === $this) {
+                $formation->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Experiences>
+     */
+    public function getExperiences(): Collection
+    {
+        return $this->experiences;
+    }
+
+    public function addExperience(Experiences $experience): static
+    {
+        if (!$this->experiences->contains($experience)) {
+            $this->experiences->add($experience);
+            $experience->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExperience(Experiences $experience): static
+    {
+        if ($this->experiences->removeElement($experience)) {
+            // set the owning side to null (unless already changed)
+            if ($experience->getUser() === $this) {
+                $experience->setUser(null);
             }
         }
 
