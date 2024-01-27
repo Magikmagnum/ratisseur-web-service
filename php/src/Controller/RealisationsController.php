@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Entity\Realisations;
 use App\Repository\RealisationsRepository;
 use App\Controller\AbstractController;
+use App\Repository\CompetencesRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -32,18 +33,25 @@ class RealisationsController extends AbstractController
      * @Route("", name="realisations_new", methods={"POST"})
      * @IsGranted("ROLE_USER")
      */
-    public function add(Request $request): Response
+    public function add(Request $request, CompetencesRepository $competencesRepository): Response
     {
         $data = json_decode($request->getContent(), true);
 
-        if (isset($data['label']) && !empty($data['label'])) {
+        if (isset($data['competenceId'])) {
 
             $erreurs = [];
 
-            $realisation = new Realisations();
-            $realisation->setLabel($data['label']);
-            $realisation->setDescription($data['description']);
-            $realisation->setCreatedAt(new \DateTimeImmutable());
+            $competence = $competencesRepository->find($data['competenceId']);
+            // Ici, nous vérifions si l'utilisateur actuel est autorisé à modifier cette identité.
+            if (!$this->isGranted('EDIT', $competence)) {
+                $response = $this->statusCode(Response::HTTP_FORBIDDEN, 'Vous n\'avez pas la permission de créer cette réalisation.');
+                return $this->json($response, $response['status']);
+            }
+
+            $realisation = new Realisations;
+            $realisation->setCompetence($competence);
+            isset($data['label']) && $realisation->setLabel($data['label']); //$erreurs[] = ['field' => 'label', 'message' => 'Veuillez remplir ce champ'];
+            isset($data['description']) && $realisation->setDescription($data['description']);
 
             // Si des erreurs de validation sont trouvées, renvoyer une réponse avec les erreurs
             if ($validationErrors = $this->validateEntity($realisation, $erreurs)) {
@@ -60,7 +68,7 @@ class RealisationsController extends AbstractController
             return $this->json($response, $response["status"], [], ["groups" => "read:realisation:item"]);
         }
 
-        $response = $this->statusCode(Response::HTTP_BAD_REQUEST);
+        $response = $this->statusCode(Response::HTTP_BAD_REQUEST, [['field' => 'competenceId', 'message' => 'Veuillez remplir ce champ']]);
         return $this->json($response, $response['status']);
     }
 
@@ -78,12 +86,12 @@ class RealisationsController extends AbstractController
 
     /**
      * @Route("/{id}", name="realisations_edit", methods={"PUT"})
-     * @IsGranted("POST_EDIT", subject="realisation")  // Autorisation pour la modification
+     * @IsGranted("EDIT", subject="realisation")  // Autorisation pour la modification
      */
     public function edit(Request $request, Realisations $realisation): Response
     {
         // Ici, vous devriez vérifier si l'utilisateur actuel est autorisé à modifier cette réalisation.
-        if (!$this->isGranted('POST_EDIT', $realisation)) {
+        if (!$this->isGranted('EDIT', $realisation)) {
             $response = $this->statusCode(Response::HTTP_FORBIDDEN, 'Vous n\'avez pas la permission de modifier cette réalisation.');
             return $this->json($response, $response['status']);
         }
@@ -93,8 +101,8 @@ class RealisationsController extends AbstractController
 
         if (isset($data)) {
 
-            $data['label'] && $realisation->setLabel($data['label']);
-            $data['description'] && $realisation->setDescription($data['description']);
+            isset($data['label']) && $realisation->setLabel($data['label']);
+            isset($data['description']) && $realisation->setDescription($data['description']);
 
             // Valider l'entité
             if ($validationErrors = $this->validateEntity($realisation)) {
@@ -114,15 +122,15 @@ class RealisationsController extends AbstractController
         return $this->json($response, $response['status']);
     }
 
+
     /**
      * @Route("/{id}", name="realisations_delete", methods={"DELETE"})
-     * @IsGranted("POST_DELETE", subject="realisation")
      * @IsGranted("ROLE_USER")
      */
     public function delete(Realisations $realisation): Response
     {
         // Ici, vous devriez vérifier si l'utilisateur actuel est autorisé à supprimer cette réalisation.
-        if (!$this->isGranted('POST_DELETE', $realisation)) {
+        if (!$this->isGranted('DELETE', $realisation)) {
             $response = $this->statusCode(Response::HTTP_FORBIDDEN, 'Vous n\'avez pas la permission de supprimer cette réalisation.');
             return $this->json($response, $response['status']);
         }

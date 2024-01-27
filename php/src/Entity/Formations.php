@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\FormationsRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FormationsRepository::class)]
 class Formations
@@ -12,21 +13,27 @@ class Formations
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['read:formation:list', 'read:formation:item'])]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'formations')]
+    #[ORM\ManyToOne(inversedBy: 'formation')]
+    #[Groups(['read:formation:list', 'read:formation:item'])]
     private ?FormationsListe $label = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['read:formation:item'])]
     private ?string $description = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['read:formation:item'])]
     private ?\DateTimeImmutable $debutAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['read:formation:item'])]
     private ?\DateTimeImmutable $finAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['read:formation:item'])]
     private ?bool $enCour = null;
 
     #[ORM\Column]
@@ -36,11 +43,19 @@ class Formations
     private ?\DateTimeImmutable $modifyAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'formation')]
+    #[Groups(['read:formation:list', 'read:formation:item'])]
     private ?Entreprises $entreprise = null;
 
     #[ORM\ManyToOne(inversedBy: 'formations')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
+
+    // Ajout du constructeur
+    public function __construct()
+    {
+        // Convertir la chaîne de date en objet DateTimeImmutable
+        $this->setCreatedAt(new \DateTimeImmutable());
+    }
 
     public function getId(): ?int
     {

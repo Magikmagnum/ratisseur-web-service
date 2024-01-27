@@ -6,7 +6,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class CompetencesVoter extends Voter
+class RealisationsVoter extends Voter
 {
     public const EDIT = 'EDIT';
     public const VIEW = 'VIEW';
@@ -16,8 +16,8 @@ class CompetencesVoter extends Voter
     {
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
-        return in_array($attribute, [self::EDIT, self::VIEW, self::DELETE])
-            && $subject instanceof \App\Entity\Competences;
+        return in_array($attribute, [self::EDIT, self::VIEW])
+            && $subject instanceof \App\Entity\Realisations;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
@@ -29,21 +29,24 @@ class CompetencesVoter extends Voter
         }
 
         // check if the subject (Identite entity) has a user association
-        $competencesUser = $subject->getUser();
+        $realisationsUser = $subject->getCompetence()->getUser();
 
+        // ... (check conditions and return true to grant permission) ...
         switch ($attribute) {
             case self::EDIT:
                 // logic to determine if the user can EDIT
-                // For example, allow editing if the user owns the Identite
-                return $user === $competencesUser;
+                return $user === $realisationsUser;
+                break;
+
             case self::VIEW:
                 // logic to determine if the user can VIEW
-                // For example, allow viewing if the user owns the Identite or has ROLE_ADMIN
-                return $user === $competencesUser || $this->isGranted('ROLE_ADMIN', $user);
+                return $user === $realisationsUser || $this->isGranted('ROLE_ADMIN', $user);
+                break;
+
             case self::DELETE:
                 // logic to determine if the user can DELETE
-                // For example, allow deletion if the user owns the Identite or has ROLE_ADMIN
-                return $user === $competencesUser || $this->isGranted('ROLE_ADMIN', $user);
+                return $user === $realisationsUser || $this->isGranted('ROLE_ADMIN', $user);
+                break;
         }
 
         return false;

@@ -6,6 +6,7 @@ use App\Repository\EntreprisesRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: EntreprisesRepository::class)]
 class Entreprises
@@ -16,18 +17,21 @@ class Entreprises
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['read:experience:item', 'read:formation:list', 'read:formation:item'])]
     private ?string $label = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['read:experience:item', 'read:formation:list', 'read:formation:item'])]
     private ?bool $etablissement = null;
 
     #[ORM\Column]
+    #[Groups(['read:experience:item'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $modifyAt = null;
 
-    #[ORM\OneToMany(mappedBy: 'yes', targetEntity: Experiences::class)]
+    #[ORM\OneToMany(mappedBy: 'entreprise', targetEntity: Experiences::class)]
     private Collection $experience;
 
     #[ORM\OneToMany(mappedBy: 'entreprise', targetEntity: Formations::class)]
@@ -35,6 +39,7 @@ class Entreprises
 
     public function __construct()
     {
+        $this->setCreatedAt(new \DateTimeImmutable());
         $this->experience = new ArrayCollection();
         $this->formation = new ArrayCollection();
     }
@@ -104,7 +109,7 @@ class Entreprises
     {
         if (!$this->experience->contains($experience)) {
             $this->experience->add($experience);
-            $experience->setYes($this);
+            $experience->setEntreprise($this);
         }
 
         return $this;
@@ -114,8 +119,8 @@ class Entreprises
     {
         if ($this->experience->removeElement($experience)) {
             // set the owning side to null (unless already changed)
-            if ($experience->getYes() === $this) {
-                $experience->setYes(null);
+            if ($experience->getEntreprise() === $this) {
+                $experience->setEntreprise(null);
             }
         }
 

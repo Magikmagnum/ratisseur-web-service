@@ -3,12 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\Competences;
+use App\Entity\CompetencesListe;
 use App\Repository\CompetencesRepository;
 use App\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use App\Repository\CompetencesListeRepository;
+
 
 /**
  * @Route("/competences")
@@ -29,15 +32,29 @@ class CompetencesController extends AbstractController
      * @Route("", name="competences_new", methods={"POST"})
      * @IsGranted("ROLE_USER")
      */
-    public function add(Request $request): Response
+    public function add(Request $request, CompetencesListeRepository $competencesListeRepository, CompetencesListe $competencesListe): Response
     {
         $data = json_decode($request->getContent(), true);
 
         if (isset($data['label']) && !empty($data['label'])) {
 
             $competence = new Competences();
-            $competence->setLabel($data['label']);
-            $data['description'] && $competence->setDescription($data['description']);
+            $entityManager = $this->getManager();
+
+            if (isset($data['label'])) {
+                if (!$competenceListe = $competencesListeRepository->findOneBy(['label' => $data['label']])) {
+                    $competenceListe = new competencesListe();
+                    $competenceListe->setLabel($data['label']);
+
+                    if ($validationErrors = $this->validateEntity($competenceListe)) {
+                        return $this->json($validationErrors, $validationErrors['status']);
+                    }
+                    $entityManager->persist($competenceListe);
+                }
+                $competence->setLabel($competenceListe);
+            }
+
+            isset($data['description']) && $competence->setDescription($data['description']);
             $competence->setUser($this->getUser());
 
             // Si des erreurs de validation sont trouvées, renvoyer une réponse avec les erreurs
@@ -71,7 +88,7 @@ class CompetencesController extends AbstractController
      * @Route("/{id}", name="competences_edit", methods={"PUT"})
      * @IsGranted("ROLE_USER")
      */
-    public function edit(Request $request, Competences $competence): Response
+    public function edit(Request $request, Competences $competence, CompetencesListeRepository $competencesListeRepository): Response
     {
         // Ici, nous vérifions si l'utilisateur actuel est autorisé à modifier cette identité.
         if (!$this->isGranted('EDIT', $competence)) {
@@ -83,8 +100,22 @@ class CompetencesController extends AbstractController
 
         if (isset($data)) {
 
-            $data['label'] && $competence->setLabel($data['label']);
-            $data['label'] && $competence->setDescription($data['description']);
+            $entityManager = $this->getManager();
+
+            if (isset($data['label'])) {
+                if (!$competenceListe = $competencesListeRepository->findOneBy(['label' => $data['label']])) {
+                    $competenceListe = new competencesListe();
+                    $competenceListe->setLabel($data['label']);
+
+                    if ($validationErrors = $this->validateEntity($competenceListe)) {
+                        return $this->json($validationErrors, $validationErrors['status']);
+                    }
+                    $entityManager->persist($competenceListe);
+                }
+                $competence->setLabel($competenceListe);
+            }
+
+            isset($data['description']) && $competence->setDescription($data['description']);
             $competence->setModifyAt(new \DateTimeImmutable());
 
             if ($validationErrors = $this->validateEntity($competence)) {

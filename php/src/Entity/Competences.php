@@ -42,9 +42,7 @@ class Competences
     // Ajout du constructeur
     public function __construct()
     {
-        // Convertir la chaîne de date en objet DateTimeImmutable
-        $createdAt = new \DateTimeImmutable();
-        $this->setCreatedAt($createdAt);
+        $this->setCreatedAt(new \DateTimeImmutable());
         $this->realisations = new ArrayCollection();
     }
 

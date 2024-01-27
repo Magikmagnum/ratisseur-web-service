@@ -45,8 +45,7 @@ class Realisations
     public function __construct()
     {
         // Convertir la chaîne de date en objet DateTimeImmutable
-        $createdAt = new \DateTimeImmutable();
-        $this->setCreatedAt($createdAt);
+        $this->setCreatedAt(new \DateTimeImmutable());
     }
 
     public function getId(): ?int

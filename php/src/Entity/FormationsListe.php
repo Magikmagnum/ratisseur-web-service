@@ -6,6 +6,7 @@ use App\Repository\FormationsListeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: FormationsListeRepository::class)]
 class FormationsListe
@@ -16,6 +17,7 @@ class FormationsListe
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['read:formation:list', 'read:formation:item'])]
     private ?string $label = null;
 
     #[ORM\Column(nullable: true)]
@@ -32,6 +34,7 @@ class FormationsListe
 
     public function __construct()
     {
+        $this->setCreatedAt(new \DateTimeImmutable());
         $this->formations = new ArrayCollection();
     }
 

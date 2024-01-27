@@ -7,6 +7,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Doctrine\Persistence\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\PreFlushEventArgs;
 
 #[ORM\Entity(repositoryClass: ExperiencesRepository::class)]
 class Experiences
@@ -14,21 +17,32 @@ class Experiences
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['read:experience:list', 'read:experience:item'])]
     private ?int $id = null;
 
+    #[ORM\ManyToOne(inversedBy: 'experiences')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['read:experience:list', 'read:experience:item'])]
+    private ?ExperiencesListe $label = null;
+
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['read:experience:item'])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['read:experience:list', 'read:experience:item'])]
     private ?\DateTimeImmutable $debutAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['read:experience:list', 'read:experience:item'])]
     private ?\DateTimeImmutable $finAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['read:experience:list', 'read:experience:item'])]
     private ?bool $enCour = null;
 
     #[ORM\OneToMany(mappedBy: 'experience', targetEntity: realisations::class)]
+    #[Groups(['read:experience:list', 'read:experience:item'])]
     private Collection $realisations;
 
     #[ORM\Column]
@@ -38,14 +52,41 @@ class Experiences
     private ?\DateTimeImmutable $modifyAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'experience')]
-    private ?Entreprises $yes = null;
+    #[Groups(['read:experience:item'])]
+    private ?Entreprises $entreprise = null;
 
     #[ORM\ManyToOne(inversedBy: 'experiences')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
+    #[ORM\PrePersist]
+    public function prePersist(LifecycleEventArgs $args): void
+    {
+        var_dump($args);
+        if ($this->finAt === null && $this->enCour !== true) {
+            throw new \Exception("L'expérience doit être soit en cours, soit avoir une date de fin.");
+        }
+    }
+
+    #[ORM\PreFlush]
+    public function preFlush(PreFlushEventArgs $args): void
+    {
+        var_dump($args);
+        // Code à exécuter avant le flush (avant la persistance)
+        if ($this->finAt === null && $this->enCour !== true) {
+            throw new \Exception("L'expérience doit être soit en cours, soit avoir une date de fin.");
+        }
+    }
+
+    #[ORM\PostLoad]
+    public function postLoad(LifecycleEventArgs $args): void
+    {
+        die('postLoad called');
+    }
+
     public function __construct()
     {
+        $this->setCreateAt(new \DateTimeImmutable());
         $this->realisations = new ArrayCollection();
     }
 
@@ -156,14 +197,14 @@ class Experiences
         return $this;
     }
 
-    public function getYes(): ?Entreprises
+    public function getEntreprise(): ?Entreprises
     {
-        return $this->yes;
+        return $this->entreprise;
     }
 
-    public function setYes(?Entreprises $yes): static
+    public function setEntreprise(?Entreprises $entreprise): static
     {
-        $this->yes = $yes;
+        $this->entreprise = $entreprise;
 
         return $this;
     }
@@ -176,6 +217,18 @@ class Experiences
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getLabel(): ?ExperiencesListe
+    {
+        return $this->label;
+    }
+
+    public function setLabel(?ExperiencesListe $label): static
+    {
+        $this->label = $label;
 
         return $this;
     }

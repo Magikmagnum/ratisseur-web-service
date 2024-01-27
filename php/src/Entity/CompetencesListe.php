@@ -37,6 +37,7 @@ class CompetencesListe
     public function __construct()
     {
         $this->competences = new ArrayCollection();
+        $this->setCreatedAt(new \DateTimeImmutable());
     }
 
     public function getId(): ?int
