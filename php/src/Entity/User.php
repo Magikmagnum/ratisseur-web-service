@@ -79,11 +79,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Experiences::class)]
     private Collection $experiences;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ImageProfil::class, orphanRemoval: true)]
+    private Collection $yes;
+
     public function __construct()
     {
         $this->competences = new ArrayCollection();
         $this->formations = new ArrayCollection();
         $this->experiences = new ArrayCollection();
+        $this->yes = new ArrayCollection();
     }
 
 
@@ -275,6 +279,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($experience->getUser() === $this) {
                 $experience->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ImageProfil>
+     */
+    public function getYes(): Collection
+    {
+        return $this->yes;
+    }
+
+    public function addYe(ImageProfil $ye): static
+    {
+        if (!$this->yes->contains($ye)) {
+            $this->yes->add($ye);
+            $ye->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeYe(ImageProfil $ye): static
+    {
+        if ($this->yes->removeElement($ye)) {
+            // set the owning side to null (unless already changed)
+            if ($ye->getUser() === $this) {
+                $ye->setUser(null);
             }
         }
 

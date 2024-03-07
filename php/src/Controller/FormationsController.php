@@ -97,6 +97,7 @@ class FormationsController extends AbstractController
         return $this->json($response, $response['status']);
     }
 
+
     /**
      * @Route("/{id}", name="formations_show", methods={"GET"})
      * @IsGranted("ROLE_USER")

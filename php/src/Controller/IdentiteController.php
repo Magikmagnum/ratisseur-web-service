@@ -36,15 +36,15 @@ class IdentiteController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        if (isset($data['label']) && !empty($data['label'])) {
+        if ($user = $this->getUser()) {
 
             $erreurs = [];
 
             $identite = new Identite();
-            $data['sexe'] ? $identite->setSexe($data['sexe']) : $erreurs[] = ['field' => 'sexe', 'message' => 'Ce champ est obligatoire'];
-            $data['nom'] && $identite->setNom($data['nom']);
-            $data['naissanceAt'] && $identite->setNaissanceAt(new \DateTimeImmutable($data['naissanceAt']));
-            $identite->setUser($this->getUser());
+            isset($data['sexe']) ? $identite->setSexe($data['sexe']) : $erreurs[] = ['field' => 'sexe', 'message' => 'Ce champ est obligatoire'];
+            isset($data['nom']) && $identite->setNom($data['nom']);
+            isset($data['naissanceAt']) && $identite->setNaissanceAt(new \DateTimeImmutable($data['naissanceAt']));
+            $identite->setUser($user);
 
             // Si des erreurs de validation sont trouvées, renvoyer une réponse avec les erreurs
             if ($validationErrors = $this->validateEntity($identite, $erreurs)) {
