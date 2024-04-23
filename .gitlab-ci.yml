@@ -1,0 +1,33 @@
+# Définit le nom du job
+deploy_symfony_app:
+  
+  # Définit les étapes qui doivent être déclenchées
+  script:
+    # Récupère le code source du dépôt
+    - git clone $CI_REPOSITORY_URL
+    - cd $CI_PROJECT_NAME
+
+    # Configure PHP et Apache
+    - apt-get update
+    - apt-get install apache2 php7.4 libapache2-mod-php7.4 php7.4-mbstring php7.4-xml php7.4-pdo php7.4-curl php7.4-openssl php7.4-intl -y
+
+    # Installe Composer
+    - curl -sS https://getcomposer.org/installer | php
+    - mv composer.phar /usr/local/bin/composer
+
+    # Installe les dépendances Composer de l'application Symfony
+    - cd php
+    - composer install --no-dev --optimize-autoloader
+
+    # Applique les mises à jour du schéma de la base de données avec Doctrine
+    - php bin/console doctrine:schema:update --force --no-interaction
+
+    # Exécute les migrations de base de données avec Doctrine
+    - php bin/console doctrine:migrations:migrate --no-interaction
+
+    # Exécute les tests PHPUnit
+    - php bin/phpunit
+
+  # Définit les tags d'environnement pour exécuter le job
+  tags:
+    - docker
