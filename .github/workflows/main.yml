@@ -1,0 +1,66 @@
+# Définit le nom du workflow
+name: Deploy Symfony App
+
+# Déclenche le workflow lorsqu'un push est effectué sur la branche "main" ou lorsqu'une pull request est ouverte vers la branche "main"
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Définit les différentes étapes du workflow
+jobs:
+  deploy:
+    # Conditionne l'exécution de la job "deploy" uniquement lorsque l'événement est une pull request
+    # cif: github.event_name == 'pull_request'
+    # Spécifie l'environnement d'exécution de la job
+    runs-on: ubuntu-latest
+
+    # Définit les différentes étapes de la job
+    steps:
+      # Étape pour récupérer le code source du dépôt
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Étape pour configurer PHP et Apache
+      - name: Setup PHP and Apache
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: mbstring, xml, pdo, curl, openssl, intl
+
+      # Étape pour installer Apache
+      - name: Install Apache
+        run: |
+          sudo apt-get update
+          sudo apt-get install apache2 -y
+
+      # Étape pour installer Composer
+      - name: Install Composer
+        run: |
+          curl -sS https://getcomposer.org/installer | php
+          mv composer.phar /usr/local/bin/composer
+
+      # Étape pour installer les dépendances Composer de l'application Symfony
+      - name: Install Composer dependencies
+        run: |
+          cd php
+          composer install --no-dev --optimize-autoloader
+
+      # Étape pour appliquer les mises à jour du schéma de la base de données avec Doctrine
+      - name: Apply Doctrine schema updates
+        run: |
+          cd php
+          php bin/console doctrine:schema:update --force --no-interaction
+
+      # Étape pour exécuter les migrations de base de données avec Doctrine
+      - name: Run database migrations
+        run: |
+          cd php
+          php bin/console doctrine:migrations:migrate --no-interaction
+
+      # Étape pour exécuter les tests PHPUnit
+      - name: Run PHPUnit tests
+        run: |
+          cd php
+          php bin/phpunit
