@@ -9,7 +9,7 @@ deploy_symfony_app:
 
     # Configure PHP et Apache
     - apt-get update
-    - apt-get install -y apache2 php libapache2-mod-php php-mbstring php-xml php-pdo php-curl php-openssl php-intl composer
+    - apt-get install -y apache2 php libapache2-mod-php php-mbstring php-xml php-pdo php-curl php7.4-openssl php-intl composer
 
     # Installe Composer
     - curl -sS https://getcomposer.org/installer | php
