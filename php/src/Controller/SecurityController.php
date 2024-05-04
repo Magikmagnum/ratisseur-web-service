@@ -139,6 +139,7 @@ class SecurityController extends AbstractController
         return $this->json($response, $response["status"], [], ["groups" => "read:auth:item"]);
     }
 
+
     /**
      * Réinitialise le mot de passe de l'utilisateur.
      *

@@ -4,9 +4,9 @@ name: Deploy Symfony App
 # Déclenche le workflow lorsqu'un push est effectué sur la branche "main" ou lorsqu'une pull request est ouverte vers la branche "main"
 on:
   push:
-    branches: [main]
+    branches: [main, dev-ratisseur]
   pull_request:
-    branches: [main]
+    branches: [main, dev-ratisseur]
 
 # Définit les différentes étapes du workflow
 jobs:

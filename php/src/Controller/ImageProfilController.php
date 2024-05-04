@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @Route("/api/imageprofil")
+ * @Route("/imageprofil")
  */
 class ImageProfilController extends AbstractController
 {
@@ -32,16 +32,14 @@ class ImageProfilController extends AbstractController
             return $this->json($response, $response['status']);
         }
 
-        // dd($data, $files);
         if (!isset($files)) {
             $response = $this->statusCode(Response::HTTP_BAD_REQUEST, 'L\'image est requis');
             return $this->json($response, $response['status']);
         }
 
-        // Créer une nouvelle instance d'ImageProfil
+        // Créer une nouvelle instance d'ImageProfil2
         $imageProfil = new ImageProfil();
         $imageProfil->setImageFile($files['imageFile']);
-
 
         // Valider l'entité ImageProfil
         if ($validationErrors = $this->validateEntity($imageProfil)) {
@@ -54,7 +52,6 @@ class ImageProfilController extends AbstractController
         // Ajouter l'utilisateur associé à l'image de profil
         $imageProfil->setUser($user);
 
-
         // Enregistrer l'entité ImageProfil dans la base de données
         $entityManager = $this->getManager();
         $entityManager->persist($imageProfil);
@@ -65,6 +62,3 @@ class ImageProfilController extends AbstractController
         return $this->json($response, $response['status']);
     }
 }
-
-
-
