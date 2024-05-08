@@ -199,27 +199,26 @@ class SecurityController extends AbstractController
     /**
      * Supprime l'utilisateur en fonction de l'e-mail et du mot de passe fournis.
      * 
-     * @Route("/users", name="security_delete", methods={"DELETE"})
+     * @Route("/users/{id}", name="security_delete", methods={"DELETE"})
      *
+     * @param int $id
      * @param Request $request
      * @param UserPasswordHasherInterface $passwordHasher
      * @param UserRepository $userRepository
      * @return JsonResponse
      */
-    public function delete(Request $request, UserPasswordHasherInterface $passwordHasher, UserRepository $userRepository): JsonResponse
+    public function delete(int $id, Request $request, UserPasswordHasherInterface $passwordHasher, UserRepository $userRepository): JsonResponse
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         // Decode JSON data
         $data = json_decode($request->getContent(), true);
 
-
         // Récupérer les données de la requête
-        $email = $data['username'];
         $password = $data['password'];
 
-        // Récupérer l'utilisateur par email
-        $user = $userRepository->findOneBy(['email' => $email]);
+        // Récupérer l'utilisateur à supprimer par son identifiant
+        $user = $userRepository->find($id);
 
         // Vérifier si l'utilisateur existe
         if (!$user) {
