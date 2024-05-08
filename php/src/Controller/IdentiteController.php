@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Entity\Identite;
 use App\Repository\IdentiteRepository;
+use App\Services\IdentiteServices;
 use App\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,30 +14,27 @@ use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
- * @Route("/identite")
+ * @Route("/")
  */
 class IdentiteController extends AbstractController
 {
     /**
-     * @Route("", name="identite_index", methods={"GET"})
+     * @Route("identite", name="identite_index", methods={"GET"})
      */
-    public function index(IdentiteRepository $identiteRepository): Response
+    public function index(IdentiteRepository $identiteRepository, IdentiteServices $identiteServices): Response
     {
         // Cette action ne nécessite pas d'autorisation spécifique
-        $identites = $identiteRepository->findAll();
-        $response = $this->statusCode(Response::HTTP_OK, $identites);
-        return $this->json($response, $response["status"], [], ["groups" => "read:identite:list"]);
+        return $identiteServices->index();
     }
 
     /**
-     * @Route("", name="identite_new", methods={"POST"})
+     * @Route("identite", name="identite_new", methods={"POST"})
      * @IsGranted("ROLE_USER")
      */
     public function add(Request $request): Response
     {
-        $data = json_decode($request->getContent(), true);
-
         if ($user = $this->getUser()) {
+            $data = json_decode($request->getContent(), true);
 
             $erreurs = [];
 
@@ -66,7 +64,7 @@ class IdentiteController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="identite_show", methods={"GET"})
+     * @Route("identite/{id}", name="identite_show", methods={"GET"})
      * @IsGranted("ROLE_USER")
      */
     public function show(Identite $identite): Response
@@ -78,7 +76,16 @@ class IdentiteController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="identite_edit", methods={"PUT"})
+     * @Route("identite_user", name="identite_user", methods={"GET"})
+     * @IsGranted("ROLE_USER")
+     */
+    public function user(IdentiteServices $identiteServices): Response
+    {
+        return $identiteServices->user();
+    }
+
+    /**
+     * @Route("identite/{id}", name="identite_edit", methods={"PUT"})
      * @IsGranted("EDIT", subject="identite")  // Autorisation pour la modification
      */
     public function edit(Request $request, Identite $identite): Response
@@ -94,7 +101,7 @@ class IdentiteController extends AbstractController
 
         if (isset($data)) {
 
-            $data['sexe'] && $identite->setSexe($data['sexe']);
+            ($data['sexe'] === true || $data['sexe'] === false) && $identite->setSexe($data['sexe']);
             $data['nom'] && $identite->setNom($data['nom']);
             $data['naissanceAt'] && $identite->setNaissanceAt(new \DateTimeImmutable($data['naissanceAt']));
 
@@ -117,7 +124,7 @@ class IdentiteController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="identite_delete", methods={"DELETE"})
+     * @Route("identite/{id}", name="identite_delete", methods={"DELETE"})
      * @IsGranted("DELETE", subject="identite")
      * @IsGranted("ROLE_USER")
      */

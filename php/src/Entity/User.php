@@ -70,13 +70,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['read:competence:list', 'read:competence:item'])]
     private ?Identite $identite = null;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Competences::class)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Competences::class, cascade: ['remove'])]
     private Collection $competences;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Formations::class)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Formations::class, cascade: ['remove'])]
     private Collection $formations;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Experiences::class)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Experiences::class, cascade: ['remove'])]
     private Collection $experiences;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: ImageProfil::class, orphanRemoval: true)]
