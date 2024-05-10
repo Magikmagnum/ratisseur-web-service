@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use App\Repository\CompetencesListeRepository;
-
+use COM;
 
 /**
  * @Route("/competences")
@@ -32,7 +32,7 @@ class CompetencesController extends AbstractController
      * @Route("", name="competences_new", methods={"POST"})
      * @IsGranted("ROLE_USER")
      */
-    public function add(Request $request, CompetencesListeRepository $competencesListeRepository, CompetencesListe $competencesListe): Response
+    public function add(Request $request, CompetencesListeRepository $competencesListeRepository): Response
     {
         $data = json_decode($request->getContent(), true);
 
@@ -43,7 +43,7 @@ class CompetencesController extends AbstractController
 
             if (isset($data['label'])) {
                 if (!$competenceListe = $competencesListeRepository->findOneBy(['label' => $data['label']])) {
-                    $competenceListe = new competencesListe();
+                    $competenceListe = new CompetencesListe();
                     $competenceListe->setLabel($data['label']);
 
                     if ($validationErrors = $this->validateEntity($competenceListe)) {
