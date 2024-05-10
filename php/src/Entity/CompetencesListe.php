@@ -34,6 +34,7 @@ class CompetencesListe
     #[ORM\OneToMany(mappedBy: 'label', targetEntity: Competences::class)]
     private Collection $competences;
 
+
     public function __construct()
     {
         $this->competences = new ArrayCollection();

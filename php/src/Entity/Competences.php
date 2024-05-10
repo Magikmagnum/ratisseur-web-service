@@ -18,6 +18,9 @@ class Competences
     #[Groups(['read:competence:list', 'read:competence:item'])]
     private ?int $id = null;
 
+    // #[ORM\ManyToOne(inversedBy: 'competences')]
+    // #[Groups(['read:competence:list', 'read:competence:item'])]
+    // private ?CompetencesListe $label = null;
     #[ORM\ManyToOne(inversedBy: 'competences')]
     #[Groups(['read:competence:list', 'read:competence:item'])]
     private ?CompetencesListe $label = null;
@@ -129,9 +132,10 @@ class Competences
         return $this;
     }
 
-    public function getLabel(): ?CompetencesListe
+    public function getLabel(): ?string
     {
-        return $this->label;
+        return $this->label->getLabel();
+        // return $this->label;
     }
 
     public function setLabel(?CompetencesListe $label): static
