@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use OpenApi\Annotations as OA;
 use App\Repository\UserRepository;
 use App\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,37 +16,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-/**
- *  
- * @OA\Post(
- *  path="/api/v1/login_check",
- *  tags={"Securities"},
- *  @OA\RequestBody(
- *      request="Login",
- *      description="Corp de la requete",
- *      required=true,
- *      @OA\JsonContent(
- *          @OA\Property(type="string", property="username", example="coucou@exemple.com"),
- *          @OA\Property(type="string", property="password", required=true, example="emileA15ans"),
- *      )
- *  ), 
- * 
- *  @OA\Response(
- *      response="200",
- *      description="Authentification",
- *      @OA\JsonContent(
- *          allOf={@OA\Schema(ref="#/components/schemas/Success")},
- *          @OA\Property(type="objet", property="data", ref="#/components/schemas/Login"),
- *      ),
- *  ),
- * 
- *  @OA\Response( response="400", ref="#/components/responses/BadRequest" ),
- *  @OA\Response( response="403", ref="#/components/responses/ForBidden" ),
- *  @OA\Response( response="404", ref="#/components/responses/NotFound" ),
- * 
- * )
- * 
- */
+
 class SecurityController extends AbstractController
 {
     /**
@@ -92,7 +61,6 @@ class SecurityController extends AbstractController
 
     /**
      * Réinitialise les données de connecxion de l'utilisateur.
-     *
      * @Route("/users/update", name="security_reset", methods={"PUT"})
      * 
      * @param Request $request
@@ -142,7 +110,6 @@ class SecurityController extends AbstractController
 
     /**
      * Réinitialise le mot de passe de l'utilisateur.
-     *
      * @Route("/users/recovery", name="security_reset_password", methods={"POST"})
      * 
      * @param Request $request
@@ -198,7 +165,6 @@ class SecurityController extends AbstractController
 
     /**
      * Supprime l'utilisateur en fonction de l'e-mail et du mot de passe fournis.
-     * 
      * @Route("/users/{id}", name="security_delete", methods={"DELETE"})
      *
      * @param int $id
@@ -250,9 +216,7 @@ class SecurityController extends AbstractController
 
     /**
      * List Users
-     *
      * Cette méthode permet de récupérer la liste des utilisateurs.
-     *
      * @Route("/users", name="list_users", methods={"GET"})
      * 
      * @param UserRepository $userRepository Le repository des utilisateurs.

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Helpers;
+namespace App\Helpers;
 
 use DateTimeImmutable;
 

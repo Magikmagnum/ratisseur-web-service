@@ -11,7 +11,7 @@ use App\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+
 
 /**
  * @Route("/")
@@ -21,24 +21,22 @@ class IdentiteController extends AbstractController
     /**
      * @Route("identite", name="identite_index", methods={"GET"})
      */
-    public function index(IdentiteRepository $identiteRepository, IdentiteServices $identiteServices): Response
+    public function index(IdentiteServices $identiteServices): Response
     {
-        // Cette action ne nécessite pas d'autorisation spécifique
         return $identiteServices->index();
     }
 
     /**
      * @Route("identite", name="identite_new", methods={"POST"})
-     * @IsGranted("ROLE_USER")
      */
     public function add(Request $request): Response
     {
         if ($user = $this->getUser()) {
-            $data = json_decode($request->getContent(), true);
-
-            $erreurs = [];
 
             $identite = new Identite();
+            $data = json_decode($request->getContent(), true);
+            $erreurs = [];
+
             isset($data['sexe']) ? $identite->setSexe($data['sexe']) : $erreurs[] = ['field' => 'sexe', 'message' => 'Ce champ est obligatoire'];
             isset($data['nom']) && $identite->setNom($data['nom']);
             isset($data['naissanceAt']) && $identite->setNaissanceAt(new \DateTimeImmutable($data['naissanceAt']));
@@ -59,25 +57,21 @@ class IdentiteController extends AbstractController
             return $this->json($response, $response["status"], [], ["groups" => "read:identite:item"]);
         }
 
-        $response = $this->statusCode(Response::HTTP_BAD_REQUEST);
+        $response = $this->statusCode(Response::HTTP_FORBIDDEN);
         return $this->json($response, $response['status']);
     }
 
     /**
      * @Route("identite/{id}", name="identite_show", methods={"GET"})
-     * @IsGranted("ROLE_USER")
      */
     public function show(Identite $identite): Response
     {
-        // Vous pouvez personnaliser la logique d'affichage ici
-        // Répondre avec succès
         $response = $this->statusCode(Response::HTTP_OK, $identite);
         return $this->json($response, $response["status"], [], ["groups" => "read:identite:item"]);
     }
 
     /**
      * @Route("identite_user", name="identite_user", methods={"GET"})
-     * @IsGranted("ROLE_USER")
      */
     public function user(IdentiteServices $identiteServices): Response
     {
@@ -86,7 +80,6 @@ class IdentiteController extends AbstractController
 
     /**
      * @Route("identite/{id}", name="identite_edit", methods={"PUT"})
-     * @IsGranted("EDIT", subject="identite")  // Autorisation pour la modification
      */
     public function edit(Request $request, Identite $identite): Response
     {
@@ -125,8 +118,6 @@ class IdentiteController extends AbstractController
 
     /**
      * @Route("identite/{id}", name="identite_delete", methods={"DELETE"})
-     * @IsGranted("DELETE", subject="identite")
-     * @IsGranted("ROLE_USER")
      */
     public function delete(Identite $identite): Response
     {

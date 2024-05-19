@@ -12,6 +12,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
+use App\Exception\DTOError;
 
 class ExceptionController extends AbstractController
 {
@@ -27,6 +28,9 @@ class ExceptionController extends AbstractController
             $response = $this->statusCode(Response::HTTP_BAD_REQUEST);
         } elseif ($exception instanceof \TypeError) {
             $response = $this->statusCode(Response::HTTP_BAD_REQUEST);
+        } elseif ($exception instanceof DTOError) {
+            $response = $this->statusCode(Response::HTTP_BAD_REQUEST);
+            $response["data"] = $exception->getDetails();
         } elseif ($exception instanceof \Exception && strpos($exception->getMessage(), 'Failed to parse time string') !== false) {
             $response = $this->statusCode(Response::HTTP_BAD_REQUEST, [], 'Erreur de format de date.');
         } elseif ($exception instanceof CircularReferenceException) {

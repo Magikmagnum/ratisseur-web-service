@@ -82,6 +82,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: ImageProfil::class, orphanRemoval: true)]
     private Collection $yes;
 
+    #[ORM\ManyToOne]
+    #[Groups(['read:competence:list', 'read:competence:item'])]
+    private ?Adresse $adresse = null;
+
     public function __construct()
     {
         $this->competences = new ArrayCollection();
@@ -311,6 +315,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $ye->setUser(null);
             }
         }
+        return $this;
+    }
+
+    public function getAdresse(): ?Adresse
+    {
+        return $this->adresse;
+    }
+
+    public function setAdresse(?Adresse $adresse): static
+    {
+        $this->adresse = $adresse;
 
         return $this;
     }

@@ -1,6 +1,8 @@
 <?php
 
 // AdresseDto.php
+namespace App\DTO;
+
 use Symfony\Component\Validator\Constraints as Assert;
 
 class AdresseDTO
@@ -10,30 +12,32 @@ class AdresseDTO
     public string $rue;
 
     #[Assert\Positive]
-    public int $appartement;
+    #[Assert\Length(min: 1, max: 3)]
+    public ?int $appartement;
 
     #[Assert\Positive]
-    public int $postalCode;
+    #[Assert\Length(min: 4, max: 6)]
+    public ?int $codePostal;
 
     #[Assert\NotBlank]
-    #[Assert\Length(min: 2, max: 255)]
-    public string $city;
+    #[Assert\Length(min: 2, max: 4)]
+    public string $ville;
 
     #[Assert\NotBlank]
-    #[Assert\Length(min: 2, max: 255)]
-    public string $country;
+    #[Assert\Length(min: 2, max: 4)]
+    public string $pays;
 
     public function __construct(
         string $rue,
-        int $appartement,
-        int $postalCode,
-        string $city,
-        string $country
+        ?int $appartement,
+        int $codePostal,
+        string $ville,
+        string $pays
     ) {
         $this->rue = $rue;
         $this->appartement = $appartement;
-        $this->postalCode = $postalCode;
-        $this->city = $city;
-        $this->country = $country;
+        $this->codePostal = $codePostal;
+        $this->ville = $ville;
+        $this->pays = $pays;
     }
 }

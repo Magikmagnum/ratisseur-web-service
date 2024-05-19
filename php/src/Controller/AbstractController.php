@@ -2,90 +2,13 @@
 
 namespace App\Controller;
 
-use OpenApi\Annotations as OA;
-use App\Controller\Helpers\CheckHelper;
+
+use App\Helpers\CheckHelper;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 
-/**
- * 
- * 
- * @OA\Parameter(
- *      name="id",
- *      in="path",
- *      description="ID de la resource",
- *      required=true,
- *      @OA\Schema(type="integer"),
- * )
- * 
- * @OA\Schema(
- *      schema="Created",
- *      description="Created",
- *      @OA\Property(property="status", type="integer", example=201),
- *      @OA\Property(type="boolean", property="success", example=true),
- *      @OA\Property(property="message", type="string", example="Ressource créer avec succès"),
- *     
- * )
- * 
- * 
- * @OA\Schema(
- *      schema="Success",
- *      description="Success",
- *      @OA\Property(property="status", type="integer", example=200),
- *      @OA\Property(type="boolean", property="success", example=true),
- *      @OA\Property(property="message", type="string", example="Requète effectué avec succès"),
- *     
- * )
- * 
- * 
- * @OA\Response(
- *  response="NotFound",
- *  @OA\JsonContent(
- *      @OA\Property(property="status", type="integer", example=404),
- *      @OA\Property(type="boolean", property="success", example=false),
- *      @OA\Property(property="message", type="string", example="Ressource inexistante"),
- *  )
- * ),
- * 
- * 
- * 
- * @OA\Response(
- *  response="Unauthorized",
- *  @OA\JsonContent(
- *      @OA\Property(property="status", type="integer", example=401),
- *      @OA\Property(type="boolean", property="success", example=false),
- *      @OA\Property(property="message", type="string", example="Impossible de vous authentifier"),
- *  )
- * ),
- * 
- * 
- * 
- * @OA\Response(
- *  response="BadRequest",
- *  @OA\JsonContent(
- *      @OA\Property(property="status", type="integer", example=400),
- *      @OA\Property(type="boolean", property="success", example=false),
- *      @OA\Property(property="message", type="string", example="Requète invalide"),
- *  )
- * ),
- * 
- * 
- * 
- * @OA\Response(
- *  response="ForBidden",
- *  @OA\JsonContent(
- *      @OA\Property(property="status", type="integer", example=403),
- *      @OA\Property(type="boolean", property="success", example=false),
- *      @OA\Property(property="message", type="string", example="Vous n'avez pas les droits requis"),
- *  )
- * ),
- * 
- * 
- * 
- * @OA\SecurityScheme(bearerFormat="JWT", type="apiKey", securityScheme="bearer"),
- */
 class AbstractController extends \Symfony\Bundle\FrameworkBundle\Controller\AbstractController
 {
     protected $check;
@@ -111,8 +34,6 @@ class AbstractController extends \Symfony\Bundle\FrameworkBundle\Controller\Abst
     {
         return new \DateTime($var, new \DateTimeZone('Africa/Libreville'));
     }
-
-
 
     /**
      * Valide les données de l'objet par rapport aux contraintes de la classe Entity.
@@ -155,18 +76,6 @@ class AbstractController extends \Symfony\Bundle\FrameworkBundle\Controller\Abst
         // Aucune erreur détectée, retourner false
         return false;
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
     // La methode fournit l'objet entity manager de Doctrine
     public function getManager()
@@ -303,16 +212,7 @@ class AbstractController extends \Symfony\Bundle\FrameworkBundle\Controller\Abst
         }
     }
 
-
-
-
-
     ///-------------------  private methods --------------------------------
-
-
-
-
-
 
     private function response($success, $statusCode, $data = [], $message = null)
     {

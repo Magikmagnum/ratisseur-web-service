@@ -14,7 +14,7 @@ use App\Entity\FormationsListe;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+
 
 /**
  * @Route("/formations")
@@ -33,7 +33,6 @@ class FormationsController extends AbstractController
 
     /**
      * @Route("", name="formations_new", methods={"POST"})
-     * @IsGranted("ROLE_USER")
      */
     public function add(Request $request, FormationsListeRepository $formationsListeRepository, EntreprisesRepository $entreprisesRepository): Response
     {
@@ -100,7 +99,6 @@ class FormationsController extends AbstractController
 
     /**
      * @Route("/{id}", name="formations_show", methods={"GET"})
-     * @IsGranted("ROLE_USER")
      */
     public function show(Formations $formation): Response
     {
@@ -110,7 +108,6 @@ class FormationsController extends AbstractController
 
     /**
      * @Route("/{id}", name="formations_edit", methods={"PUT"})
-     * @IsGranted("ROLE_USER")
      */
     public function edit(Request $request, Formations $formation, FormationsListeRepository $formationsListeRepository, EntreprisesRepository $entreprisesRepository): Response
     {
@@ -122,7 +119,7 @@ class FormationsController extends AbstractController
         $data = json_decode($request->getContent(), true);
 
         if (isset($data)) {
-            
+
             $entityManager = $this->getManager();
 
             if (isset($data['label'])) {
@@ -174,7 +171,6 @@ class FormationsController extends AbstractController
 
     /**
      * @Route("/{id}", name="formations_delete", methods={"DELETE"})
-     * @IsGranted("ROLE_USER")
      */
     public function delete(Formations $formation): Response
     {

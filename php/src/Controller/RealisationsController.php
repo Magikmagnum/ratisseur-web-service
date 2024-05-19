@@ -11,7 +11,7 @@ use App\Repository\CompetencesRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+
 
 /**
  * @Route("/realisation")
@@ -31,7 +31,6 @@ class RealisationsController extends AbstractController
 
     /**
      * @Route("", name="realisations_new", methods={"POST"})
-     * @IsGranted("ROLE_USER")
      */
     public function add(Request $request, CompetencesRepository $competencesRepository): Response
     {
@@ -74,7 +73,6 @@ class RealisationsController extends AbstractController
 
     /**
      * @Route("/{id}", name="realisations_show", methods={"GET"})
-     * @IsGranted("ROLE_USER")
      */
     public function show(Realisations $realisation): Response
     {
@@ -86,7 +84,6 @@ class RealisationsController extends AbstractController
 
     /**
      * @Route("/{id}", name="realisations_edit", methods={"PUT"})
-     * @IsGranted("EDIT", subject="realisation")  // Autorisation pour la modification
      */
     public function edit(Request $request, Realisations $realisation): Response
     {
@@ -125,7 +122,6 @@ class RealisationsController extends AbstractController
 
     /**
      * @Route("/{id}", name="realisations_delete", methods={"DELETE"})
-     * @IsGranted("ROLE_USER")
      */
     public function delete(Realisations $realisation): Response
     {

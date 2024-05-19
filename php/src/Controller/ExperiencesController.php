@@ -14,7 +14,7 @@ use App\Entity\ExperiencesListe;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+
 
 /**
  * @Route("/experiences")
@@ -34,7 +34,6 @@ class ExperiencesController extends AbstractController
 
     /**
      * @Route("", name="experiences_new", methods={"POST"})
-     * @IsGranted("ROLE_USER")
      */
     public function add(Request $request, ExperiencesListeRepository $experiencesListeRepository, EntreprisesRepository $entreprisesRepository): Response
     {
@@ -111,7 +110,6 @@ class ExperiencesController extends AbstractController
 
     /**
      * @Route("/{id}", name="experiences_show", methods={"GET"})
-     * @IsGranted("ROLE_USER")
      */
     public function show(Experiences $experience): Response
     {
@@ -121,7 +119,6 @@ class ExperiencesController extends AbstractController
 
     /**
      * @Route("/{id}", name="experiences_edit", methods={"PUT"})
-     * @IsGranted("ROLE_USER")
      */
     public function edit(Request $request, Experiences $experience, ExperiencesListeRepository $experiencesListeRepository, EntreprisesRepository $entreprisesRepository): Response
     {
@@ -191,7 +188,6 @@ class ExperiencesController extends AbstractController
 
     /**
      * @Route("/{id}", name="experiences_delete", methods={"DELETE"})
-     * @IsGranted("ROLE_USER")
      */
     public function delete(Experiences $experience): Response
     {

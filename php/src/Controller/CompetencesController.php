@@ -9,16 +9,16 @@ use App\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+
 use App\Repository\CompetencesListeRepository;
 
 /**
- * @Route("/competences")
+ * @Route("")
  */
 class CompetencesController extends AbstractController
 {
     /**
-     * @Route("", name="competences_index", methods={"GET"})
+     * @Route("/competences", name="competences_index", methods={"GET"})
      */
     public function index(CompetencesRepository $competencesRepository): Response
     {
@@ -28,15 +28,13 @@ class CompetencesController extends AbstractController
     }
 
     /**
-     * @Route("", name="competences_new", methods={"POST"})
-     * @IsGranted("ROLE_USER")
+     * @Route("/competences", name="competences_new", methods={"POST"})
      */
     public function add(Request $request, CompetencesListeRepository $competencesListeRepository): Response
     {
         $data = json_decode($request->getContent(), true);
 
         if (isset($data['label']) && !empty($data['label'])) {
-
             $competence = new Competences();
             $entityManager = $this->getManager();
 
@@ -74,8 +72,7 @@ class CompetencesController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="competences_show", methods={"GET"})
-     * @IsGranted("ROLE_USER")
+     * @Route("/competences/{id}", name="competences_show", methods={"GET"})
      */
     public function show(Competences $competence): Response
     {
@@ -84,8 +81,7 @@ class CompetencesController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="competences_edit", methods={"PUT"})
-     * @IsGranted("ROLE_USER")
+     * @Route("/competences/{id}", name="competences_edit", methods={"PUT"})
      */
     public function edit(Request $request, Competences $competence, CompetencesListeRepository $competencesListeRepository): Response
     {
@@ -132,8 +128,7 @@ class CompetencesController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="competences_delete", methods={"DELETE"})
-     * @IsGranted("ROLE_USER")
+     * @Route("/competences/{id}", name="competences_delete", methods={"DELETE"})
      */
     public function delete(Competences $competence): Response
     {
