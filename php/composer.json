@@ -80,6 +80,7 @@
         }
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^3.6",
         "fakerphp/faker": "^1.23",
         "liip/test-fixtures-bundle": "^2.6",
         "phpunit/phpunit": "*",

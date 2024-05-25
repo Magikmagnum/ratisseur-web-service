@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 use App\Repository\CompetencesListeRepository;
+use App\Services\CompetencesServices;
 
 /**
  * @Route("")
@@ -28,7 +29,16 @@ class CompetencesController extends AbstractController
     }
 
     /**
-     * @Route("/competences", name="competences_new", methods={"POST"})
+     * @Route("/competences/{id}", name="competences_show", methods={"GET"})
+     */
+    public function show(Competences $competence): Response
+    {
+        $response = $this->statusCode(Response::HTTP_OK, $competence);
+        return $this->json($response, $response["status"], [], ["groups" => "read:competence:item"]);
+    }
+
+    /**
+     * @Route("/competences_user", name="competences_new", methods={"POST"})
      */
     public function add(Request $request, CompetencesListeRepository $competencesListeRepository): Response
     {
@@ -72,16 +82,7 @@ class CompetencesController extends AbstractController
     }
 
     /**
-     * @Route("/competences/{id}", name="competences_show", methods={"GET"})
-     */
-    public function show(Competences $competence): Response
-    {
-        $response = $this->statusCode(Response::HTTP_OK, $competence);
-        return $this->json($response, $response["status"], [], ["groups" => "read:competence:item"]);
-    }
-
-    /**
-     * @Route("/competences/{id}", name="competences_edit", methods={"PUT"})
+     * @Route("/competences_user/{id}", name="competences_edit", methods={"PUT"})
      */
     public function edit(Request $request, Competences $competence, CompetencesListeRepository $competencesListeRepository): Response
     {
@@ -128,7 +129,7 @@ class CompetencesController extends AbstractController
     }
 
     /**
-     * @Route("/competences/{id}", name="competences_delete", methods={"DELETE"})
+     * @Route("/competences_user/{id}", name="competences_delete", methods={"DELETE"})
      */
     public function delete(Competences $competence): Response
     {
@@ -144,5 +145,26 @@ class CompetencesController extends AbstractController
 
         $response = $this->statusCode(Response::HTTP_OK);
         return $this->json($response, $response['status']);
+    }
+
+    /**
+     * @Route("/competences_client", name="competences_exclus_curent_user", methods={"GET"})
+     */
+    public function listCompetencesExclusCurrentUser(CompetencesServices $competencesServices): Response
+    {
+        // Ici, nous vérifions si l'utilisateur actuel est autorisé à modifier cette identité.
+        if (!$user = $this->getUser()) {
+            $response = $this->statusCode(Response::HTTP_FORBIDDEN);
+            return $this->json($response, $response['status']);
+        }
+        return $competencesServices->find_all_competences_except_user($user->getId());
+    }
+
+    /**
+     * @Route("/competences_client/{id}", name="competences_client_index", methods={"GET"})
+     */
+    public function listCompetencesByUserId(int $id, CompetencesServices $competencesServices): Response
+    {
+        return $competencesServices->find_all_competences_by_user($id);
     }
 }
