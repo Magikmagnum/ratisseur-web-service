@@ -5,7 +5,6 @@
 namespace App\Controller;
 
 use App\Entity\Identite;
-use App\Repository\IdentiteRepository;
 use App\Services\IdentiteServices;
 use App\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,7 +18,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class IdentiteController extends AbstractController
 {
     /**
-     * @Route("identite", name="identite_index", methods={"GET"})
+     * @Route("identites", name="identite_index", methods={"GET"})
      */
     public function index(IdentiteServices $identiteServices): Response
     {
@@ -27,7 +26,7 @@ class IdentiteController extends AbstractController
     }
 
     /**
-     * @Route("identite", name="identite_new", methods={"POST"})
+     * @Route("identites", name="identite_new", methods={"POST"})
      */
     public function add(Request $request): Response
     {
@@ -62,7 +61,7 @@ class IdentiteController extends AbstractController
     }
 
     /**
-     * @Route("identite/{id}", name="identite_show", methods={"GET"})
+     * @Route("identites/{id}", name="identite_show", methods={"GET"})
      */
     public function show(Identite $identite): Response
     {
@@ -71,7 +70,7 @@ class IdentiteController extends AbstractController
     }
 
     /**
-     * @Route("identite_user", name="identite_user", methods={"GET"})
+     * @Route("identites_user", name="identite_user", methods={"GET"})
      */
     public function user(IdentiteServices $identiteServices): Response
     {
@@ -79,7 +78,15 @@ class IdentiteController extends AbstractController
     }
 
     /**
-     * @Route("identite/{id}", name="identite_edit", methods={"PUT"})
+     * @Route("identites_user_put", name="identite_user_put", methods={"POST"})
+     */
+    public function put(Request $request, IdentiteServices $identiteServices): Response
+    {
+        return $identiteServices->put($request);
+    }
+
+    /**
+     * @Route("identites/{id}", name="identite_edit", methods={"PUT"})
      */
     public function edit(Request $request, Identite $identite): Response
     {
@@ -117,7 +124,7 @@ class IdentiteController extends AbstractController
     }
 
     /**
-     * @Route("identite/{id}", name="identite_delete", methods={"DELETE"})
+     * @Route("identites/{id}", name="identite_delete", methods={"DELETE"})
      */
     public function delete(Identite $identite): Response
     {
@@ -136,3 +143,5 @@ class IdentiteController extends AbstractController
         return $this->json($response, $response['status']);
     }
 }
+
+// selenuim

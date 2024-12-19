@@ -39,7 +39,8 @@ class Identite
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $modifyAt = null;
 
-    #[ORM\OneToOne(inversedBy: 'identite', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'identite')]
+    // #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?User $user = null;
 
     // Ajout du constructeur

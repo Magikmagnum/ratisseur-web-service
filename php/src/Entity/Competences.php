@@ -15,18 +15,15 @@ class Competences
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['read:competence:list', 'read:competence:item'])]
+    #[Groups(['read:competence:list', 'read:competence:item', 'read:competence:list:user'])]
     private ?int $id = null;
 
-    // #[ORM\ManyToOne(inversedBy: 'competences')]
-    // #[Groups(['read:competence:list', 'read:competence:item'])]
-    // private ?CompetencesListe $label = null;
     #[ORM\ManyToOne(inversedBy: 'competences')]
-    #[Groups(['read:competence:list', 'read:competence:item'])]
+    #[Groups(['read:competence:list', 'read:competence:item', 'read:competence:list:user'])]
     private ?CompetencesListe $label = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['read:competence:list', 'read:competence:item'])]
+    #[Groups(['read:competence:list', 'read:competence:item', 'read:competence:list:user'])]
     private ?string $description = null;
 
     #[ORM\Column]
@@ -41,6 +38,9 @@ class Competences
 
     #[ORM\OneToMany(mappedBy: 'competence', targetEntity: Realisations::class, orphanRemoval: true)]
     private Collection $realisations;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $enseigne = null;
 
     // Ajout du constructeur
     public function __construct()
@@ -141,6 +141,18 @@ class Competences
     public function setLabel(?CompetencesListe $label): static
     {
         $this->label = $label;
+
+        return $this;
+    }
+
+    public function getEnseigne(): ?string
+    {
+        return $this->enseigne;
+    }
+
+    public function setEnseigne(?string $enseigne): static
+    {
+        $this->enseigne = $enseigne;
 
         return $this;
     }

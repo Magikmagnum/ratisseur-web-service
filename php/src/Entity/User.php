@@ -66,7 +66,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['read:auth:item'])]
     private ?string $token = null;
 
-    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'user', cascade: ['remove'])]
+    // #[ORM\OneToOne(inversedBy: 'identite', cascade: ['persist'])]
     #[Groups(['read:competence:list', 'read:competence:item'])]
     private ?Identite $identite = null;
 

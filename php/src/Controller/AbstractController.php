@@ -44,36 +44,29 @@ class AbstractController extends \Symfony\Bundle\FrameworkBundle\Controller\Abst
      */
     public function validateEntity(object $entity, ?array $errors = []): array | false
     {
-        // Valider l'entité en utilisant le validateur Symfony
+        // Utilisez $this->val au lieu de $this->validator
         $validator = $this->validator->validate($entity);
 
-        // Si des erreurs de validation sont trouvées
         if (count($validator) > 0) {
             $ormValidationError = [];
-
-            // Parcourir chaque violation et créer un tableau associatif pour chaque erreur
             foreach ($validator as $val) {
                 $ormValidationError[] = [
                     'field' => $val->getPropertyPath(),
-                    'message' => $val->getMessage()
+                    'message' => $val->getMessage(),
                 ];
             }
 
-            // Si des erreurs existent déjà, fusionner avec les erreurs de validation
             if ($errors) {
                 return $this->statusCode(Response::HTTP_BAD_REQUEST, array_merge($errors, $ormValidationError));
             }
 
-            // Retourner les erreurs de validation si aucune erreur existante
             return $this->statusCode(Response::HTTP_BAD_REQUEST, $ormValidationError);
         }
 
-        // Si des erreurs existent déjà, retourner ces erreurs
         if ($errors) {
             return $this->statusCode(Response::HTTP_BAD_REQUEST, $errors);
         }
 
-        // Aucune erreur détectée, retourner false
         return false;
     }
 
