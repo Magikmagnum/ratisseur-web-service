@@ -104,10 +104,10 @@ class CompetencesServices extends AbstractController implements CompetenceInterf
             $competenceListe = new CompetencesListe();
             $competenceListe->setLabel($label);
 
-            if ($validationErrors = $this->validateEntity($competenceListe)) {
+            if ($validationErrors = $this->validateEntities($competenceListe)) {
                 return $this->json($validationErrors, $validationErrors['status']);
             }
-            $this->getManager()->entityManager->persist($competenceListe);
+            $this->sauvegardeEntity($competenceListe, true);
         }
         return $competenceListe;
     }

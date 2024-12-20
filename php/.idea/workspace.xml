@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="1d72f55e-2358-4b7e-b5dd-a3bdfdc1a9c7" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/main.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/main.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apache/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/apache/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/php/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/php/composer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/php/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/php/composer.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/php/config/bundles.php" beforeDir="false" afterPath="$PROJECT_DIR$/php/config/bundles.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/php/src/Controller/Helpers/dataStorageCroquette.txt" beforeDir="false" afterPath="$PROJECT_DIR$/php/src/Controller/Helpers/dataStorageCroquette.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/php/src/Controller/ImageProfilController.php" beforeDir="false" afterPath="$PROJECT_DIR$/php/src/Controller/ImageProfilController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/php/symfony.lock" beforeDir="false" afterPath="$PROJECT_DIR$/php/symfony.lock" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="/opt/homebrew/Cellar/php/8.3.6/bin/php" />
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 1
+}]]></component>
+  <component name="ProjectId" id="2ffcF5lSterVqCvTnyf3JWI7EY7" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "dev-ratisseur",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-1d06a55b98c1-74d2a5396914-JavaScript-PS-241.14494.237" />
+        <option value="bundled-php-predefined-ba97393d7c68-8f0632a2a215-com.jetbrains.php.sharedIndexes-PS-241.14494.237" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1d72f55e-2358-4b7e-b5dd-a3bdfdc1a9c7" name="Changes" comment="" />
+      <created>1714195466894</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1714195466894</updated>
+      <workItem from="1714195468761" duration="26000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

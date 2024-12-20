@@ -1,0 +1,11 @@
+violet : #6858D8
+jaune : #F6C550
+orange : #EF8361
+vert : #00a3b4
+rouge: #EC6373
+
+
+
+// -------------------------------- 
+police sofia Pro ---> regular ----> size 16px
+

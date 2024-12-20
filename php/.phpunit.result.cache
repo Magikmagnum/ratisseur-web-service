@@ -1,0 +1,1 @@
+{"version":1,"defects":{"App\\Tests\\UserRepositoryTest::testCount":4,"UserControllerTest::testDeleteUser":4,"Warning":6},"times":{"App\\Tests\\UserRepositoryTest::testCount":0.051,"UserControllerTest::testDeleteUser":1.319,"Warning":0.004}}
