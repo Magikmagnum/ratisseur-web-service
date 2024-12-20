@@ -17,8 +17,17 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
+enum MessageError: string
+{
+    case NO_FILE = "No file uploaded";
+    case UPLOAD_FAILED = "File upload failed";
+}
+
 class CompetencesServices extends AbstractController implements CompetenceInterface
 {
+    const  CUSTOME_IMAGE_DIRECTORY = "images/competences";
+    const  CUSTOME_IMAGE_NAME = "competences_";
+
     private CompetencesListeRepository $competencesListeRepository;
     private ImageUploader $imageUploader;
     private CompetencesRepository $competencesRepository;
@@ -50,6 +59,18 @@ class CompetencesServices extends AbstractController implements CompetenceInterf
     }
 
 
+    public function modifierUneCompetence(Competences $competence, Request $request)
+    {
+        $competence = $this->hydrateEntity($competence, $request);
+        if ($validationErrors = $this->validateEntities($competence)) {
+            return $this->json($validationErrors, $validationErrors['status']);
+        }
+        $this->sauvegardeEntity($competence);
+        $response = $this->statusCode(Response::HTTP_OK, $competence);
+        return $this->json($response, $response["status"], [], ["groups" => "read:competence:item"]);
+    }
+
+
     private function hydrateEntity(Competences $competence, Request $request): Competences
     {
         $data = $request->request->all();
@@ -67,7 +88,9 @@ class CompetencesServices extends AbstractController implements CompetenceInterf
 
         // Vérifie et assigne l'enseigne si présente
         if ($data['enseigne']) {
-            $competence->setEnseigne($this->uploadImage($data['enseigne']));
+            $competence->setEnseigne(
+                $this->imageUploader->upload($data['enseigne'], self::CUSTOME_IMAGE_DIRECTORY, self::CUSTOME_IMAGE_NAME, $competence->getEnseigne() ?: null)
+            );
         }
 
         // Vérifie et assigne la description si présente
@@ -91,19 +114,25 @@ class CompetencesServices extends AbstractController implements CompetenceInterf
         return $competenceListe;
     }
 
-    protected function uploadImage(UploadedFile $uploadedFile): string
-    {
-        if (!$uploadedFile) {
-            throw new RuntimeException('No file uploaded', Response::HTTP_BAD_REQUEST);
-        }
 
-        try {
-            return $this->imageUploader->upload($uploadedFile);
-        } catch (RuntimeException $e) {
-            // Déclenche une exception au lieu de retourner une réponse JSON
-            throw new RuntimeException('File upload failed: ' . $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR, $e);
-        }
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Sauvegarde une entité dans la base de données.
@@ -160,7 +189,7 @@ class CompetencesServices extends AbstractController implements CompetenceInterf
 
 
 
-    public function modifierUneCompetence(Request $request) {}
+
     public function supprimerUneCompetence(Request $request) {}
     public function listerLesCompetences(Request $request) {}
     public function listerLesCompetencesParUtilisateur(Request $request) {}
