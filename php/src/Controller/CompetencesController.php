@@ -40,10 +40,10 @@ class CompetencesController extends AbstractController
         return $competencesServices->creerUneCompetence($request);
     }
 
-    #[Route('/{id}', name: 'competences_id', methods: ['POST'])]
-    public function edit(Competences $competense, Request $request, CompetencesServices $competencesServices): Response
+    #[Route('/{id}', name: 'competences_edit', methods: ['POST'])]
+    public function edit(Competences $competence, Request $request, CompetencesServices $competencesServices): Response
     {
-        return $competencesServices->modifierUneCompetence($competense, $request);
+        return $competencesServices->modifierUneCompetence($competence, $request);
     }
 
 

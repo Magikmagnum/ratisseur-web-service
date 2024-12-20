@@ -2,7 +2,6 @@
 
 namespace App\Services\Competence;
 
-use RuntimeException;
 use App\Entity\Competences;
 use App\Helpers\ImageUploader;
 use App\Services\UserServices;
@@ -13,9 +12,8 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Repository\CompetencesListeRepository;
 use Symfony\Component\HttpFoundation\Response;
 use App\Services\Competence\CompetenceInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 enum MessageError: string
 {
