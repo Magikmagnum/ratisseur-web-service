@@ -57,9 +57,9 @@ class CompetencesServices extends AbstractController implements CompetenceInterf
     }
 
 
-    public function modifierUneCompetence(Competences $competence, Request $request)
+    public function modifierUneCompetence($id, Request $request)
     {
-        $competence = $this->hydrateEntity($competence, $request);
+        $competence = $this->hydrateEntity($this->competencesRepository->find($id), $request);
         if ($validationErrors = $this->validateEntities($competence)) {
             return $this->json($validationErrors, $validationErrors['status']);
         }

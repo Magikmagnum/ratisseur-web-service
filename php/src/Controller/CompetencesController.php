@@ -7,6 +7,7 @@ use App\Entity\CompetencesListe;
 use App\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\CompetencesListeRepository;
+use App\Repository\CompetencesRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Services\Competence\CompetencesServices;
@@ -41,9 +42,9 @@ class CompetencesController extends AbstractController
     }
 
     #[Route('/{id}', name: 'competences_edit', methods: ['POST'])]
-    public function edit(Competences $competence, Request $request, CompetencesServices $competencesServices): Response
+    public function edit($id, Request $request, CompetencesServices $competencesServices): Response
     {
-        return $competencesServices->modifierUneCompetence($competence, $request);
+        return $competencesServices->modifierUneCompetence($id, $request);
     }
 
 
