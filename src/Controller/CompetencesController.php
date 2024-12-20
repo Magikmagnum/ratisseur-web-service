@@ -65,9 +65,6 @@ class CompetencesController extends AbstractController
 
 
 
-
-
-
     #[Route('/{id}', name: 'competences_delete', methods: ['DELETE'])]
     public function delete(Competences $competence): Response
     {
