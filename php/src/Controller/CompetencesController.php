@@ -35,7 +35,7 @@ class CompetencesController extends AbstractController
     }
 
     #[Route('', name: 'competences_user_new', methods: ['POST'])]
-    public function add(CompetencesServices $competencesServices, Request $request, CompetencesListeRepository $competencesListeRepository): Response
+    public function add(Request $request, CompetencesServices $competencesServices): Response
     {
         return $competencesServices->creerUneCompetence($request);
     }
@@ -138,4 +138,22 @@ class CompetencesController extends AbstractController
     //         ]);
     //     }
     // }
+
+    /**
+     * @Route("/images/{path}", name="image_display", methods={"GET"})
+     */
+    public function display(string $path): Response
+    {
+        $filePath = $this->getParameter('upload_directory') . "/" . $path;
+
+        if (!file_exists($filePath)) {
+            return new Response("Image not found", Response::HTTP_NOT_FOUND);
+        }
+
+        return new Response(
+            file_get_contents($filePath),
+            Response::HTTP_OK,
+            ['Content-Type' => 'image/jpeg'] // Adjust MIME type as needed
+        );
+    }
 }

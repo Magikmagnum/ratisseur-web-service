@@ -10,10 +10,13 @@ security:
                 class: App\Entity\User
                 property: email
     firewalls:
+        public_files:
+            pattern: ^/public/
+            stateless: true
+            security: false
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-
         login:
             pattern: ^/api/v1/login
             stateless: true
@@ -21,17 +24,14 @@ security:
                 check_path: /api/v1/login #/api/v1/login_check or api_login_check as defined in config/routes.yaml
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
-
         register:
             pattern: ^/api/v1/register
             stateless: true
             security: false
-
         api:
             pattern:   ^/api
             stateless: true
             jwt: ~
-
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 
@@ -49,6 +49,8 @@ security:
         - { path: '^/profile', roles: 'ROLE_USER' }
         - { path: '^/api/v1/register', roles: 'IS_AUTHENTICATED_ANONYMOUSLY', methods: 'POST' }
         - { path: '^/api/v1/login', roles: 'IS_AUTHENTICATED_ANONYMOUSLY', methods: 'POST' }
+        - { path: '^/public/', roles: 'IS_AUTHENTICATED_ANONYMOUSLY', methods: 'GET' }
+        - { path: ^/api/v1/competences_user/images/.+, roles: IS_AUTHENTICATED_ANONYMOUSLY', methods: 'GET' }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:

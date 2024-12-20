@@ -39,6 +39,7 @@ class Competences
     #[ORM\OneToMany(mappedBy: 'competence', targetEntity: Realisations::class, orphanRemoval: true)]
     private Collection $realisations;
 
+    #[Groups(['read:competence:list', 'read:competence:item', 'read:competence:list:user'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $enseigne = null;
 
