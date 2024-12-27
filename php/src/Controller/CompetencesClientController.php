@@ -5,14 +5,13 @@ namespace App\Controller;
 use App\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 use App\Services\Competence\CompetencesServices;
 
 class CompetencesClientController extends AbstractController
 {
     #[Route('/competences_client', name: 'competences_clients_index', methods: ['GET'])]
-    public function index(CompetencesServices $competencesServices): JsonResponse
+    public function index(CompetencesServices $competencesServices): Response
     {
         // Ici, nous vérifions si l'utilisateur actuel est autorisé à modifier cette identité.
         if (!$user = $this->getUser()) {
