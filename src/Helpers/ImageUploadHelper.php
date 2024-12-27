@@ -14,9 +14,8 @@ enum MessageErreur: string
     case SUPPRESSION_FICHIER_IMPOSSIBLE = 'Impossible de supprimer le fichier "%s".';
     case TELECHARGEMENT_ECHOUE = 'Le téléchargement du fichier a échoué : %s';
 }
-class ImageUploader
+class ImageUploadHelper
 {
-
     /**
      * Uploder une image existante.
      *
@@ -89,9 +88,9 @@ class ImageUploader
         // Vérifie si le fichier existe
         if (!file_exists($filePath)) {
             throw new \RuntimeException(sprintf(MessageErreur::FICHIER_INTROUVABLE->value, $imageName));
+            // Supprime le fichier
         }
 
-        // Supprime le fichier
         if (!unlink($filePath)) {
             throw new \RuntimeException(sprintf(MessageErreur::SUPPRESSION_FICHIER_IMPOSSIBLE->value, $filePath));
         }
